@@ -1,951 +1,939 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Digestive Traffic Control SimLab</title>
-<style>
-  :root{
-    --olive:#4f5f39;
-    --olive-dark:#334025;
-    --sage:#dfe7d4;
-    --terracotta:#a64f37;
-    --terracotta-dark:#7d3827;
-    --sand:#ead7b7;
-    --cream:#fbf7ef;
-    --paper:#fffdf8;
-    --charcoal:#2f2b27;
-    --muted:#625a52;
-    --gold:#a96f12;
-    --blue:#315d68;
-    --blue-light:#e4f0f2;
-    --danger:#912f2f;
-    --border:#c9bba7;
-    --shadow:0 8px 24px rgba(57,45,31,.12);
-  }
-
-  *{box-sizing:border-box}
-  html{scroll-behavior:smooth}
-  body{
-    margin:0;
-    font-family:Arial, Helvetica, sans-serif;
-    color:var(--charcoal);
-    background:linear-gradient(180deg,#f7f1e6 0%,#efe4d3 100%);
-    line-height:1.55;
-  }
-
-  button,input,textarea{font:inherit}
-  button{cursor:pointer}
-  button:focus-visible,input:focus-visible,textarea:focus-visible,summary:focus-visible{
-    outline:4px solid #1f6ea8;
-    outline-offset:3px;
-  }
-
-  header{
-    background:var(--olive-dark);
-    color:#fff;
-    border-bottom:6px solid var(--terracotta);
-  }
-  header .wrap{
-    max-width:1180px;
-    margin:auto;
-    padding:1rem 1.25rem;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:1rem;
-  }
-  .brand{display:flex;align-items:center;gap:.9rem}
-  .brand-mark{
-    width:52px;height:52px;border-radius:50%;
-    display:grid;place-items:center;
-    background:var(--sand);color:var(--olive-dark);
-    font-weight:900;letter-spacing:.04em;
-    border:3px solid #fff;
-  }
-  .brand h1{font-size:1.25rem;margin:0}
-  .brand div:last-child div{font-size:.95rem;color:#f5ead8}
-  #simIdHeader{font-weight:700;font-size:.9rem;text-align:right}
-
-  .container{max-width:1180px;margin:0 auto;padding:1.25rem}
-  .screen{display:none}
-  .screen.active{display:block}
-
-  .panel{
-    background:var(--paper);
-    border:1px solid var(--border);
-    border-radius:18px;
-    box-shadow:var(--shadow);
-    padding:1.25rem;
-    margin-bottom:1.1rem;
-  }
-  h2,h3{line-height:1.2;color:var(--olive-dark)}
-  h2{font-size:clamp(1.65rem,3vw,2.35rem);margin-top:0}
-  h3{font-size:1.25rem}
-  p{max-width:82ch}
-
-  .hero{
-    display:grid;
-    grid-template-columns:1.25fr .75fr;
-    gap:1.25rem;
-    align-items:center;
-    min-height:320px;
-  }
-  .hero-art{
-    min-height:265px;
-    background:linear-gradient(145deg,var(--sage),#f1e6d3);
-    border:1px solid var(--border);
-    border-radius:18px;
-    display:grid;
-    place-items:center;
-    padding:1rem;
-  }
-  .digestive-hero-map{width:100%;max-width:330px;display:grid;gap:.6rem}
-  .hero-node{
-    display:grid;grid-template-columns:48px 1fr;align-items:center;gap:.7rem;
-    background:#fff;border:1px solid var(--border);border-radius:13px;padding:.65rem .75rem;
-    font-weight:800;color:var(--olive-dark);box-shadow:0 4px 12px rgba(0,0,0,.08)
-  }
-  .hero-node span:first-child{font-size:1.65rem;text-align:center}
-  .hero-arrow{text-align:center;color:var(--terracotta);font-size:1.3rem;font-weight:900;line-height:.6}
-
-  .notice{
-    background:#f6efe4;
-    border-left:6px solid var(--gold);
-    padding:.9rem 1rem;
-    border-radius:10px;
-    margin:.9rem 0;
-  }
-  .small{font-size:.9rem;color:var(--muted)}
-  .label{display:block;font-size:.78rem;text-transform:uppercase;letter-spacing:.045em;color:var(--muted);font-weight:800}
-  .value{display:block;font-weight:800;margin-top:.18rem}
-
-  .criteria-grid{
-    display:grid;
-    grid-template-columns:repeat(3,minmax(0,1fr));
-    gap:.8rem;
-    margin-top:1rem;
-  }
-  .criteria-card{
-    background:var(--cream);
-    border:1px solid var(--border);
-    border-radius:13px;
-    padding:1rem;
-  }
-  .criteria-card h3{margin:.1rem 0 .55rem}
-
-  .button-row{display:flex;flex-wrap:wrap;gap:.7rem;margin-top:1rem}
-  .btn-primary,.btn-secondary,.btn-light{
-    border-radius:10px;
-    padding:.72rem 1rem;
-    font-weight:800;
-    border:2px solid transparent;
-  }
-  .btn-primary{background:var(--terracotta);color:#fff}
-  .btn-primary:hover{background:var(--terracotta-dark)}
-  .btn-secondary{background:var(--olive);color:#fff}
-  .btn-secondary:hover{background:var(--olive-dark)}
-  .btn-light{background:#fff;color:var(--olive-dark);border-color:var(--olive)}
-  .btn-light:hover{background:var(--sage)}
-  .btn-disabled{opacity:.55;cursor:not-allowed}
-
-  .case-layout{display:grid;grid-template-columns:1.05fr .95fr;gap:1rem}
-  .case-card{background:var(--cream);border:1px solid var(--border);border-radius:15px;padding:1rem}
-  .meal-title{display:flex;gap:.7rem;align-items:flex-start}
-  .meal-icon{font-size:2.3rem;line-height:1}
-  .component-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.55rem;margin-top:.8rem}
-  .component{background:#fff;border:1px solid var(--border);border-radius:9px;padding:.55rem .65rem}
-  .challenge-card{background:#fff5ed;border:2px solid #d59a76;border-radius:15px;padding:1rem}
-  .challenge-title{color:var(--terracotta-dark);font-weight:900;font-size:1.1rem}
-
-  .digestive-map{
-    display:grid;
-    grid-template-columns:repeat(4,minmax(0,1fr));
-    gap:.55rem;
-    margin:1rem 0;
-  }
-  .map-step{
-    border:2px solid var(--border);border-radius:12px;background:#fff;padding:.7rem;text-align:center;
-    color:var(--muted);font-weight:800;min-height:76px;display:grid;place-items:center;
-  }
-  .map-step.current{border-color:var(--terracotta);background:#fff4eb;color:var(--terracotta-dark);box-shadow:0 0 0 3px rgba(166,79,55,.13)}
-  .map-step.complete{border-color:var(--olive);background:#eff4e9;color:var(--olive-dark)}
-
-  .progress{
-    width:100%;height:13px;background:#e4ded4;border-radius:999px;overflow:hidden;
-    border:1px solid #b8aa98;margin:.65rem 0 1rem;
-  }
-  #progressBar{height:100%;background:var(--terracotta);width:0;transition:width .3s ease}
-
-  .dashboard{
-    display:grid;
-    grid-template-columns:repeat(4,minmax(0,1fr));
-    gap:.75rem;
-    margin:1rem 0;
-  }
-  .meter-card{
-    border:1px solid var(--border);
-    background:var(--cream);
-    border-radius:13px;
-    padding:.8rem;
-    min-height:130px;
-  }
-  .meter-card strong{display:block;min-height:2.6em;color:var(--olive-dark)}
-  .meter-track{
-    width:100%;height:12px;background:#e2dacf;border-radius:999px;
-    overflow:hidden;border:1px solid #b9ab98;margin:.5rem 0;
-  }
-  .meter-fill{height:100%;width:0;background:var(--olive);transition:width .35s ease}
-  .meter-number{font-size:.88rem;font-weight:800}
-  .meter-status{font-size:.78rem;color:var(--muted);margin-top:.25rem}
-
-  .molecule-board{
-    border:1px solid var(--border);background:#f8f4eb;border-radius:14px;padding:1rem;margin:1rem 0;
-  }
-  .molecule-board h3{margin-top:0}
-  .molecule-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.6rem}
-  .molecule-card{background:#fff;border:1px solid var(--border);border-radius:11px;padding:.7rem;min-height:114px}
-  .molecule-icon{font-size:1.45rem}
-  .molecule-name{font-weight:900;color:var(--olive-dark);margin:.15rem 0}
-  .molecule-form{font-size:.82rem;color:var(--muted)}
-  .route-chip{display:inline-block;margin-top:.45rem;border-radius:999px;padding:.23rem .5rem;font-size:.75rem;font-weight:800;background:var(--sage);color:var(--olive-dark)}
-  .route-chip.wait{background:#f3e3cd;color:#75451f}
-  .route-chip.block{background:#f5d9d6;color:#792b28}
-  .route-chip.blood{background:#dceaf2;color:#244e61}
-  .route-chip.lymph{background:#e7e0f1;color:#4d3d67}
-
-  .choice-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}
-  .choice-card{
-    width:100%;text-align:left;background:#fff;
-    border:2px solid var(--border);border-radius:15px;padding:1rem;
-    color:var(--charcoal);min-height:185px;
-    transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease;
-  }
-  .choice-card:hover:not(:disabled){transform:translateY(-3px);border-color:var(--terracotta);box-shadow:0 8px 18px rgba(70,51,37,.14)}
-  .choice-card.selected{border-color:var(--olive-dark);background:#eff4e9;box-shadow:0 0 0 3px rgba(79,95,57,.18)}
-  .choice-card:disabled{cursor:default;opacity:.9}
-  .choice-title{font-size:1.08rem;font-weight:900;color:var(--olive-dark);display:flex;gap:.5rem;align-items:flex-start}
-  .choice-desc{margin:.55rem 0;color:#4d4741}
-  .choice-meta{display:inline-block;background:#f1e6d4;border-radius:999px;padding:.28rem .55rem;font-size:.78rem;font-weight:800}
-
-  .change-panel,.organ-box{display:none;margin-top:1rem}
-  .change-panel.show,.organ-box.show{display:block}
-  .change-panel{background:#f7f1e7;border:1px solid var(--border);border-radius:14px;padding:1rem}
-  .change-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.65rem}
-  .change-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:.7rem}
-  .change-values{display:flex;gap:.35rem;align-items:center;font-weight:900;margin-top:.35rem;flex-wrap:wrap}
-  .change-arrow{color:var(--muted)}
-  .change-good{color:#2f652c}
-  .change-watch{color:#8d341f}
-  .change-neutral{color:#4f4a45}
-
-  .organ-box{border-left:7px solid var(--blue);background:var(--blue-light);border-radius:12px;padding:1rem}
-  .organ-title{font-weight:900;color:#244c55;font-size:1.08rem;margin-bottom:.25rem}
-  .concept-tag{display:inline-block;margin-top:.5rem;background:#fff;border:1px solid #8ba6ab;border-radius:999px;padding:.25rem .55rem;font-size:.8rem;font-weight:800}
-
-  .report-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.85rem}
-  .score-card{background:var(--cream);border:1px solid var(--border);border-radius:12px;padding:1rem}
-  .timeline{display:grid;gap:.75rem}
-  .timeline-item{border-left:6px solid var(--terracotta);background:var(--cream);padding:.8rem 1rem;border-radius:9px}
-  .timeline-stats{font-size:.82rem;color:var(--muted);margin-top:.35rem}
-  .fingerprint{font-family:Consolas,monospace;font-size:.85rem;word-break:break-word;background:#f2eee7;border:1px dashed #907f6d;padding:.65rem;border-radius:8px}
-
-  textarea,input[type="text"]{
-    width:100%;border:1px solid #81786f;border-radius:10px;padding:.75rem;background:#fff;color:var(--charcoal)
-  }
-  textarea{min-height:155px;resize:vertical}
-  input[type="text"]{min-height:46px}
-  .response-block{margin-top:1.15rem}
-  .word-ok{color:#2f652c;font-weight:800}
-  .word-watch{color:#8d341f;font-weight:800}
-
-  details{border:1px solid var(--border);border-radius:12px;background:var(--cream);padding:.7rem .85rem;margin-top:1rem}
-  summary{font-weight:900;color:var(--olive-dark);cursor:pointer}
-  table{border-collapse:collapse;width:100%;margin-top:.75rem;background:#fff}
-  th,td{border:1px solid #9f9281;padding:.55rem;text-align:left;vertical-align:top}
-  th{background:var(--sage);color:var(--olive-dark)}
-
-  .sr-only{
-    position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;
-    overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important;
-  }
-
-  @media (max-width:980px){
-    .dashboard{grid-template-columns:repeat(2,minmax(0,1fr))}
-    .molecule-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
-    .change-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-    .case-layout{grid-template-columns:1fr}
-  }
-  @media (max-width:760px){
-    header .wrap{align-items:flex-start;flex-direction:column}
-    #simIdHeader{text-align:left}
-    .hero{grid-template-columns:1fr}
-    .choice-grid,.report-grid,.criteria-grid{grid-template-columns:1fr}
-    .digestive-map{grid-template-columns:repeat(2,minmax(0,1fr))}
-  }
-  @media (max-width:520px){
-    .dashboard,.change-grid,.component-grid{grid-template-columns:1fr}
-    .molecule-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-    .container{padding:.75rem}
-    .panel{padding:1rem}
-  }
-
-  @media print{
-    body{background:#fff;font-size:10.5pt}
-    header,.no-print,#welcomeScreen,#caseScreen,#simulationScreen{display:none!important}
-    #reportScreen{display:block!important}
-    .container{max-width:none;margin:0;padding:0}
-    .panel{box-shadow:none;border:1px solid #999;break-inside:avoid;margin:.4rem 0;padding:.75rem}
-    .report-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:.45rem}
-    .timeline-item{break-inside:avoid}
-    textarea{border:1px solid #777;min-height:120px}
-    .print-page-break{break-before:page}
-    details{display:block}
-    details > *{display:block}
-  }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GI Evidence Lab SimLab</title>
+  <style>
+    :root{
+      --olive:#6b7a52;
+      --sage:#aab59b;
+      --terracotta:#b75a3c;
+      --sand:#e9dfcf;
+      --cream:#f7f3ec;
+      --charcoal:#2f3430;
+      --gold:#c49a3a;
+      --teal:#4a7d78;
+      --soft-red:#b94b4b;
+      --soft-blue:#557a9b;
+      --line:#d7cdbd;
+      --good:#2f7a4d;
+      --bad:#973d2f;
+      --neutral:#6d6d6d;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      color:var(--charcoal);
+      background:linear-gradient(180deg,var(--cream),#fff 220px);
+    }
+    .wrap{
+      max-width:1100px;
+      margin:0 auto;
+      padding:22px;
+    }
+    .hero{
+      background:linear-gradient(135deg,var(--olive),var(--teal));
+      color:#fff;
+      border-radius:18px;
+      padding:26px 28px;
+      box-shadow:0 10px 30px rgba(0,0,0,.12);
+      margin-bottom:18px;
+    }
+    h1,h2,h3{margin-top:0}
+    .hero h1{margin-bottom:8px;font-size:2rem}
+    .hero p{max-width:850px;line-height:1.45}
+    .pillbar{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+    .pill{background:rgba(255,255,255,.16);padding:8px 12px;border-radius:999px;font-size:.93rem}
+    .card{
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:18px;
+      box-shadow:0 8px 24px rgba(0,0,0,.05);
+      margin-bottom:16px;
+    }
+    .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:16px}
+    .subgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+    .mini{
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:12px;
+      background:var(--cream);
+    }
+    .mini h4{margin:0 0 6px 0;font-size:1rem;color:var(--olive)}
+    .note{
+      background:#f7f8f3;
+      border-left:5px solid var(--olive);
+      padding:12px 14px;
+      border-radius:10px;
+      margin-top:10px;
+      line-height:1.45;
+    }
+    .progress{
+      display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px
+    }
+    .prog{
+      flex:1 1 100px;
+      min-width:90px;
+      text-align:center;
+      font-size:.85rem;
+      padding:10px 6px;
+      border-radius:10px;
+      border:1px solid var(--line);
+      background:#f6f4ef;
+      color:#555;
+    }
+    .prog.active{background:#efe4ce;border-color:var(--gold);color:#4a3f2a;font-weight:700}
+    .prog.done{background:#edf6ee;border-color:#b7d6bf;color:#245239}
+    .question-title{font-size:1.2rem;margin-bottom:6px}
+    .claim{font-weight:700;color:var(--terracotta)}
+    .case-tag{
+      display:inline-block;background:#f4ebe0;color:#694026;padding:6px 10px;border-radius:999px;font-size:.86rem;margin-bottom:10px
+    }
+    .options{display:grid;gap:10px;margin:14px 0}
+    label.option{
+      display:block;
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:12px 14px;
+      cursor:pointer;
+      background:#fff;
+      transition:.15s ease;
+    }
+    label.option:hover{border-color:var(--olive);background:#fcfbf8}
+    label.option input{margin-right:10px}
+    .btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    button{
+      border:none;
+      border-radius:12px;
+      padding:12px 16px;
+      cursor:pointer;
+      font-size:1rem;
+      font-weight:700;
+    }
+    .primary{background:var(--olive);color:#fff}
+    .secondary{background:var(--sand);color:var(--charcoal)}
+    .accent{background:var(--terracotta);color:#fff}
+    .ghost{background:#fff;border:1px solid var(--line);color:var(--charcoal)}
+    .feedback{
+      border-radius:12px;
+      padding:14px;
+      margin-top:12px;
+      line-height:1.45;
+    }
+    .correct{background:#edf6ee;border:1px solid #bfdcc6}
+    .incorrect{background:#fbefec;border:1px solid #e4c2bc}
+    .hidden{display:none !important}
+    .evidence-grid{display:grid;grid-template-columns:repeat(1,1fr);gap:10px}
+    .evidence-item{border:1px solid var(--line);border-radius:12px;padding:12px;background:#fff}
+    .evidence-label{font-size:.86rem;color:#666;text-transform:uppercase;letter-spacing:.03em;margin-bottom:5px}
+    .evidence-value{font-weight:700;line-height:1.35}
+    .status{font-size:.82rem;margin-top:6px;color:#666}
+    .status.good{color:var(--good)}
+    .status.bad{color:var(--bad)}
+    .status.neutral{color:var(--neutral)}
+    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    table{width:100%;border-collapse:collapse;font-size:.95rem}
+    th,td{border:1px solid var(--line);padding:10px;vertical-align:top;text-align:left}
+    th{background:#f5efe5}
+    textarea,input[type="text"]{
+      width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;font:inherit
+    }
+    textarea{min-height:130px;resize:vertical}
+    .small{font-size:.9rem;color:#666}
+    .scorebox{
+      background:linear-gradient(135deg,#fcfaf6,#f3ebdc);
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:15px;
+    }
+    .scorebig{font-size:2rem;font-weight:700;color:var(--terracotta)}
+    .kicker{font-size:.84rem;color:#666;text-transform:uppercase;letter-spacing:.05em}
+    .footer-space{height:24px}
+    @media (max-width:900px){
+      .grid,.two-col,.subgrid{grid-template-columns:1fr}
+    }
+    @media print {
+      body{background:#fff}
+      .hero{box-shadow:none}
+      .no-print{display:none !important}
+      .card{box-shadow:none}
+      .wrap{max-width:none;padding:0}
+      textarea{border:1px solid #999;min-height:150px}
+    }
+  </style>
 </head>
 <body>
-<header>
   <div class="wrap">
-    <div class="brand">
-      <div class="brand-mark" aria-hidden="true">VS</div>
-      <div>
-        <h1>Valencia Nutrition SimLab</h1>
-        <div>Digestive Traffic Control: Process, Absorb, or Move Forward</div>
+    <div class="hero">
+      <h1>GI Evidence Lab SimLab</h1>
+      <p>Analyze what happens to a hormone, enzyme, medication, or nutrient-related case as it moves through the digestive tract. Use the stomach, small intestine, absorption, and site-of-action evidence to decide whether a claim is supported, partially supported, or not supported.</p>
+      <div class="pillbar">
+        <div class="pill">Randomized case pool</div>
+        <div class="pill">5 checkpoints</div>
+        <div class="pill">Case-specific report</div>
+        <div class="pill">2 open-ended responses</div>
+        <div class="pill">Printable rubric</div>
       </div>
     </div>
-    <div id="simIdHeader" aria-live="polite"></div>
+
+    <section id="startScreen" class="card">
+      <h2>Start Your Case</h2>
+      <div class="subgrid">
+        <div class="mini">
+          <h4>Purpose</h4>
+          <p>Use digestive-system evidence to explain why some swallowed substances can work inside the GI tract while others must survive digestion and reach the bloodstream intact. This will help you evaluate health claims and understand how digestion, absorption, and medication delivery are connected.</p>
+        </div>
+        <div class="mini">
+          <h4>Task</h4>
+          <p>Complete one randomly assigned case involving a hormone, enzyme, medication, or absorption problem. At five checkpoints, analyze what happens to the substance and decide whether the case claim is supported, partially supported, or not supported.</p>
+        </div>
+      </div>
+      <div class="grid" style="margin-top:14px;">
+        <div>
+          <div class="mini">
+            <h4>Instructions</h4>
+            <ol>
+              <li>Enter your name and select <strong>Start Random Case</strong>.</li>
+              <li>Read the claim and identify what must happen for the substance to work.</li>
+              <li>Complete all five checkpoints. Use the Evidence Panel to follow molecule integrity, site of action, absorption potential, local GI effects, and possible nutrient impacts.</li>
+              <li>After the verdict, review your case report and answer the two open-ended questions in your own words.</li>
+              <li>Save the finished report as a PDF on your desktop and upload the PDF to the Canvas assignment.</li>
+            </ol>
+          </div>
+          <div class="note"><strong>Key question:</strong> Must this substance survive digestion, act inside the GI tract, or be broken down as part of digestion?</div>
+          <p class="small"><strong>Successful work</strong> uses the assigned case evidence, distinguishes digestion from absorption, and explains the process clearly rather than only repeating definitions.</p>
+        </div>
+        <div>
+          <div class="mini">
+            <h4>Possible Cases</h4>
+            <ul>
+              <li>Insulin pill</li>
+              <li>Growth hormone in dairy or meat</li>
+              <li>Lactase tablet</li>
+              <li>Antacids and GERD</li>
+              <li>Pancreatic enzyme capsule</li>
+              <li>Celiac-related malabsorption</li>
+            </ul>
+          </div>
+          <div class="mini" style="margin-top:12px;">
+            <h4>Student Information</h4>
+            <label for="studentName">Student name</label>
+            <input id="studentName" type="text" placeholder="Enter your name" />
+            <div class="btnrow">
+              <button class="primary" id="startBtn">Start Random Case</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="simScreen" class="hidden">
+      <div class="progress" id="progressBar"></div>
+      <div class="grid">
+        <div>
+          <div class="card">
+            <div class="case-tag" id="caseIdTag"></div>
+            <h2 id="caseTitle"></h2>
+            <p class="claim" id="caseClaim"></p>
+            <p id="caseLead"></p>
+          </div>
+          <div class="card" id="questionCard">
+            <div class="question-title" id="questionTitle"></div>
+            <p id="questionPrompt"></p>
+            <div id="questionBody"></div>
+            <div id="feedback" class="hidden"></div>
+            <div class="btnrow no-print">
+              <button class="primary" id="submitBtn">Submit</button>
+              <button class="accent hidden" id="nextBtn">Next Checkpoint</button>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <h3>Evidence Panel</h3>
+            <div class="evidence-grid" id="evidencePanel"></div>
+          </div>
+          <div class="card">
+            <h3>How to Read the Evidence</h3>
+            <div class="mini">
+              <p><strong>Molecule integrity:</strong> Is the substance still intact, partly fragmented, or fully broken down?</p>
+              <p><strong>Site of action:</strong> Where does it need to work: GI lumen, intestinal wall, bloodstream, or target tissue?</p>
+              <p><strong>Absorption potential:</strong> Is it ready to cross the intestinal border?</p>
+              <p><strong>Local GI effect:</strong> What is changing in the digestive environment?</p>
+              <p><strong>Secondary nutrient impact:</strong> Does this case also affect digestion or absorption of other nutrients?</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="reportScreen" class="hidden">
+      <div class="card">
+        <div class="btnrow no-print" style="justify-content:space-between;align-items:center;">
+          <div>
+            <h2 style="margin-bottom:6px;">Case Report</h2>
+            <div class="small">Review your case evidence, then complete both open-ended questions before saving your report.</div>
+          </div>
+          <div class="btnrow">
+            <button class="ghost" id="newCaseBtn">Try Another Random Case</button>
+          </div>
+        </div>
+      </div>
+      <div class="grid">
+        <div>
+          <div class="card">
+            <h3>Simulation Summary</h3>
+            <table>
+              <tr><th>Student</th><td id="rStudent"></td></tr>
+              <tr><th>Simulation ID</th><td id="rSimId"></td></tr>
+              <tr><th>Decision fingerprint</th><td id="rFingerprint"></td></tr>
+              <tr><th>Case</th><td id="rCase"></td></tr>
+              <tr><th>Original claim</th><td id="rClaim"></td></tr>
+            </table>
+          </div>
+          <div class="card">
+            <h3>Decision Review</h3>
+            <table id="decisionTable"></table>
+          </div>
+          <div class="card">
+            <h3>Evidence Trail</h3>
+            <table id="evidenceTable"></table>
+          </div>
+          <div class="card">
+            <h3>Open-Ended Responses</h3>
+            <p><strong>1. Why is this digestive and absorption process important to understand?</strong> Use your assigned case to explain at least one potential impact of not understanding what happens to the substance as it moves through the GI tract.</p>
+            <textarea id="sa1" aria-label="Response to question 1"></textarea>
+            <p><strong>2. What part of the process is still least clear or was hardest for you to understand?</strong> Identify a specific digestive step, absorption step, substance change, or GI location from your case and explain what makes that part difficult.</p>
+            <textarea id="sa2" aria-label="Response to question 2"></textarea>
+            <div class="note no-print" style="margin-top:16px;">
+              <strong>Submit your report to Canvas</strong>
+              <ol style="margin-bottom:0;">
+                <li>Finish both open-ended responses.</li>
+                <li>Select <strong>Save Report as PDF</strong> below.</li>
+                <li>In the print window, choose <strong>Save as PDF</strong>.</li>
+                <li>Save the file on your desktop using a clear filename such as <strong>Lastname_Firstname_GI_Evidence_Lab.pdf</strong>.</li>
+                <li>Upload that PDF to the Canvas assignment.</li>
+              </ol>
+            </div>
+            <div class="btnrow no-print">
+              <button class="secondary" id="printBtn">Save Report as PDF</button>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="card scorebox">
+            <div class="kicker">Auto-scored decision section</div>
+            <div class="scorebig" id="scoreBig"></div>
+            <div id="scoreText"></div>
+          </div>
+          <div class="card">
+            <h3>Instructor Rubric (20 points)</h3>
+            <table>
+              <tr><th>Criterion</th><th>Points</th></tr>
+              <tr><td>Substance and success requirement: correctly identifies what the substance or issue is and what must happen for it to work.</td><td>4</td></tr>
+              <tr><td>GI-tract analysis: accurately interprets what happens at the stomach and small-intestine checkpoints.</td><td>5</td></tr>
+              <tr><td>Absorption and site of action: distinguishes acting within the GI tract from entering blood and reaching a target tissue.</td><td>4</td></tr>
+              <tr><td>Importance and impact: explains why the process matters and gives a logical case-specific impact of misunderstanding it.</td><td>4</td></tr>
+              <tr><td>Process reflection and own reasoning: identifies a specific difficult or unclear part of the process and explains it in the student’s own thoughts and words.</td><td>3</td></tr>
+              <tr><th>Total</th><th>20</th></tr>
+            </table>
+          </div>
+          <div class="card">
+            <h3>Notes for Students</h3>
+            <ul>
+              <li>Connect Question 1 to the hormone, enzyme, medication, or absorption issue in your assigned case.</li>
+              <li>For Question 2, name the exact step or location that remains difficult or unclear.</li>
+              <li>Do not write that “nothing was difficult” without discussing a specific part of the process.</li>
+              <li>Write in your own words. A strong answer sounds like <em>your</em> explanation of <em>your</em> randomized case.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="footer-space"></div>
+    </section>
   </div>
-</header>
 
-<main class="container">
-  <section id="welcomeScreen" class="screen active" aria-labelledby="welcomeTitle">
-    <div class="panel hero">
-      <div>
-        <h2 id="welcomeTitle">Guide one mixed meal through the digestive tract.</h2>
-        <p>At each checkpoint, decide what the digestive system should do next. Your choices change the digestive environment and determine whether nutrients are ready to cross the intestinal border.</p>
-        <div class="notice"><strong>The key question throughout the SimLab:</strong> Should the body process this meal, absorb its products, or move the remaining material forward?</div>
-        <div class="button-row">
-          <button type="button" class="btn-primary" id="startBtn">Generate My Case File</button>
-        </div>
-      </div>
-      <div class="hero-art" aria-hidden="true">
-        <div class="digestive-hero-map">
-          <div class="hero-node"><span>👄</span><span>Reduce particle size</span></div>
-          <div class="hero-arrow">↓</div>
-          <div class="hero-node"><span>🧪</span><span>Control pH and break bonds</span></div>
-          <div class="hero-arrow">↓</div>
-          <div class="hero-node"><span>🚦</span><span>Route only absorbable products</span></div>
-        </div>
-      </div>
-    </div>
+  <script>
+    const casePool = [
+      {
+        id:'INS',
+        title:'Why Insulin Has To Be Taken by Injection Instead of an Ordinary Pill',
+        claim:'“Insulin is a medicine, so a regular insulin pill should work the same way as an insulin shot.”',
+        lead:'Track a swallowed insulin tablet through the GI tract and decide whether a regular pill could deliver insulin in a useful form.',
+        contrast:'Lactase tablet',
+        comparePrompt:'Explain why a lactase tablet can help when swallowed, while a regular insulin pill usually cannot.',
+        initialEvidence:{integrity:['Intact insulin protein','neutral'], site:['Swallowed substance in GI tract','neutral'], absorption:['Not yet relevant','neutral'], local:['No therapeutic effect yet','neutral'], secondary:['No clear nutrient effect identified','neutral']},
+        steps:[
+          { type:'mcq', key:'classify', title:'Checkpoint 1: Identify the substance', prompt:'What best describes regular insulin in this case?', options:[
+              'A peptide hormone (a protein) that must keep its shape to work',
+              'A simple sugar that is quickly absorbed',
+              'A mineral antacid that neutralizes stomach acid',
+              'A fiber that remains in the large intestine'
+            ], correct:0,
+            feedback:'Insulin is a peptide hormone. Its shape matters because it must bind to receptors on body cells to work.' },
+          { type:'mcq', key:'success', title:'Checkpoint 2: Define success', prompt:'What must happen for swallowed insulin to work like injected insulin?', options:[
+              'It must be broken into amino acids before absorption',
+              'It must reach the bloodstream intact and still be functional',
+              'It must stay in the stomach and neutralize acid',
+              'It must remain inside the intestinal lumen to digest lactose'
+            ], correct:1,
+            feedback:'Injected insulin bypasses digestion. To have the same effect, it would need to reach the bloodstream intact and functional.' },
+          { type:'mcq', key:'stomach', title:'Checkpoint 3: Stomach checkpoint', prompt:'What is the most important problem for a regular insulin pill in the stomach?', options:[
+              'Stomach acid and pepsin begin denaturing and digesting the insulin protein',
+              'Insulin is converted into glucose for rapid energy',
+              'The stomach pumps insulin directly into the bloodstream',
+              'Bile emulsifies the insulin so it can dissolve in fat'
+            ], correct:0,
+            feedback:'The stomach is harsh for proteins. Acid alters insulin’s structure and pepsin begins breaking peptide bonds.',
+            evidenceAfter:{integrity:['Denatured and beginning to fragment','bad'], site:['Stomach lumen','neutral'], absorption:['Not ready for absorption as insulin','bad'], local:['Protein digestion has begun','neutral'], secondary:['No helpful nutrient effect; insulin function is being lost','bad']}
+          },
+          { type:'mcq', key:'intestine', title:'Checkpoint 4: Small intestine and absorption checkpoint', prompt:'Even if some insulin survived the stomach, what is the best explanation of what would happen next?', options:[
+              'Pancreatic proteases and peptidases would continue digesting it, and intact insulin would not readily cross into blood',
+              'The small intestine would absorb intact insulin exactly like glucose',
+              'Bicarbonate would rebuild the insulin molecule so it could work again',
+              'Insulin would move to the large intestine and become more active'
+            ], correct:0,
+            feedback:'The small intestine continues protein digestion. Amino acids can be absorbed, but the original insulin molecule is no longer present as an intact hormone.',
+            evidenceAfter:{integrity:['Fragmented into peptides / amino acids','bad'], site:['Small-intestinal lumen','neutral'], absorption:['Only amino acids can absorb; intact insulin is not available','bad'], local:['Protein digestion continues; hormone function is lost','bad'], secondary:['Absorbed amino acids do not act like insulin','bad']}
+          },
+          { type:'final', key:'verdict', title:'Checkpoint 5: Evidence-based verdict', prompt:'What is the best verdict on the original claim?', verdictOptions:['Supported','Partially supported','Not supported'], correctVerdict:2, evidenceOptions:[
+              'In the stomach, acid and pepsin begin denaturing and digesting insulin.',
+              'Insulin works best after it is fully broken into amino acids.',
+              'In the small intestine, proteases continue digestion and intact insulin does not readily reach the bloodstream.',
+              'Bile turns insulin into a usable hormone in the small intestine.'
+            ], correctEvidence:[0,2],
+            feedback:'A regular insulin pill is not supported by the digestive evidence. The molecule is digested and does not reach the bloodstream intact like injected insulin.' }
+        ]
+      },
+      {
+        id:'BST',
+        title:'Are Growth Hormones in Milk or Meat Biologically Active in Humans?',
+        claim:'“If a cow receives growth hormone, then people who drink the milk or eat the meat will absorb that hormone and it will act in the human body.”',
+        lead:'Evaluate whether a peptide hormone from food can survive digestion, be absorbed intact, and still act as a useful hormone in a human.',
+        contrast:'Insulin injection',
+        comparePrompt:'Explain why a hormone given by injection can act in the body while a hormone eaten in food usually does not.',
+        initialEvidence:{integrity:['Intact protein hormone from food source','neutral'], site:['Swallowed as part of food','neutral'], absorption:['Not yet relevant','neutral'], local:['No digestive processing yet','neutral'], secondary:['No clear nutrient effect identified','neutral']},
+        steps:[
+          { type:'mcq', key:'classify', title:'Checkpoint 1: Identify the substance', prompt:'What best describes this growth hormone claim?', options:[
+              'A protein or peptide hormone that would need to stay intact to act hormonally',
+              'A starch that must be digested into glucose',
+              'A mineral that neutralizes acid',
+              'An insoluble fiber that is never altered in the GI tract'
+            ], correct:0,
+            feedback:'Growth hormone is a protein/peptide hormone. A hormone has to remain intact enough to interact with receptors.' },
+          { type:'mcq', key:'success', title:'Checkpoint 2: Define success', prompt:'For the claim to be true, what would have to happen?', options:[
+              'The hormone would need to survive digestion, reach circulation, and still have biologic activity',
+              'The hormone would need to become amino acids first in order to act as a hormone',
+              'The hormone would only need to stay in the stomach',
+              'The hormone would need to bind bile acids in the large intestine'
+            ], correct:0,
+            feedback:'For a food-borne hormone to affect the body hormonally, it would need to survive digestion and remain biologically active after absorption.' },
+          { type:'mcq', key:'stomach', title:'Checkpoint 3: Stomach checkpoint', prompt:'What is the best prediction for a protein hormone in the stomach?', options:[
+              'Acid and pepsin begin denaturing and breaking it down',
+              'It becomes more hormonally active after mixing with HCl',
+              'It moves directly through the stomach wall intact',
+              'It is emulsified by bile in the stomach'
+            ], correct:0,
+            feedback:'The stomach treats dietary proteins as proteins, not as preserved hormones.',
+            evidenceAfter:{integrity:['Denatured / early fragmentation','bad'], site:['Stomach lumen','neutral'], absorption:['Not ready for absorption as a hormone','bad'], local:['Protein digestion begins','neutral'], secondary:['Behaving like dietary protein, not active hormone','neutral']}
+          },
+          { type:'mcq', key:'intestine', title:'Checkpoint 4: Small intestine and absorption checkpoint', prompt:'What is the best conclusion at the small-intestinal border?', options:[
+              'Further protein digestion continues; fragments or amino acids may be absorbed, but the original hormone is not acting as a hormone',
+              'The hormone is routinely absorbed intact and becomes strongly active in humans',
+              'Bicarbonate converts amino acids back into a working hormone',
+              'The hormone becomes fiber and stays in the colon'
+            ], correct:0,
+            feedback:'Even if amino acids are absorbed, that is not the same as absorbing an intact, working hormone.',
+            evidenceAfter:{integrity:['Broken into smaller fragments / amino acids','bad'], site:['Small-intestinal lumen and border','neutral'], absorption:['Possible as amino acids, not as intact active hormone','bad'], local:['Normal protein digestion and absorption rules apply','neutral'], secondary:['Main outcome is nutrient absorption, not hormone signaling','neutral']}
+          },
+          { type:'final', key:'verdict', title:'Checkpoint 5: Evidence-based verdict', prompt:'What is the best verdict on the original claim?', verdictOptions:['Supported','Partially supported','Not supported'], correctVerdict:2, evidenceOptions:[
+              'In the stomach, the hormone is exposed to acid and pepsin like other proteins.',
+              'Hormones become more biologically active after full digestion into amino acids.',
+              'At the intestinal border, amino acids may be absorbed, but that is not the same as absorbing an intact active hormone.',
+              'Bile stores the hormone so it can reach human tissues unchanged.'
+            ], correctEvidence:[0,2],
+            feedback:'The claim is not supported. Digestion breaks the hormone down, and the digestive tract is not a simple delivery route for active food hormones.' }
+        ]
+      },
+      {
+        id:'LAC',
+        title:'Why Can a Lactase Tablet Work When Swallowed?',
+        claim:'“A lactase tablet can still help even though lactase itself is a protein.”',
+        lead:'Compare a digestive enzyme with a hormone. Decide why one may work inside the GI tract without needing to enter the bloodstream.',
+        contrast:'Regular insulin pill',
+        comparePrompt:'Explain why lactase may help without entering the bloodstream, while insulin must reach the bloodstream intact.',
+        initialEvidence:{integrity:['Lactase enzyme in tablet form','neutral'], site:['Swallowed with or just before dairy food','neutral'], absorption:['Not yet relevant','neutral'], local:['Goal is local digestion of lactose','good'], secondary:['If lactose is split, carbohydrate absorption improves','good']},
+        steps:[
+          { type:'mcq', key:'classify', title:'Checkpoint 1: Identify the substance', prompt:'What best describes lactase in this case?', options:[
+              'A digestive enzyme protein meant to act on lactose in the GI tract',
+              'A hormone that must travel through blood to muscle cells',
+              'A mineral used to neutralize HCl',
+              'A fat-soluble vitamin that must enter lymph first'
+            ], correct:0,
+            feedback:'Lactase is an enzyme. The key difference is that it can help by acting locally in the digestive tract.' },
+          { type:'mcq', key:'success', title:'Checkpoint 2: Define success', prompt:'What must happen for a lactase tablet to be helpful?', options:[
+              'It must enter the bloodstream intact and act on distant cells',
+              'It must break lactose into absorbable sugars before lactose reaches the brush border',
+              'It must stop stomach acid production completely',
+              'It must stay inactive until the large intestine'
+            ], correct:1,
+            feedback:'Lactase only needs to work long enough in the upper GI tract to split lactose into glucose and galactose.' },
+          { type:'mcq', key:'stomach', title:'Checkpoint 3: Stomach checkpoint', prompt:'Which statement best describes the stomach checkpoint?', options:[
+              'Some enzyme activity may be lost in the stomach, but the goal is still local digestion rather than bloodstream delivery',
+              'The stomach absorbs lactase directly into the blood',
+              'Pepsin turns lactase into a hormone that controls blood sugar',
+              'Lactase neutralizes acid like an antacid'
+            ], correct:0,
+            feedback:'Not all swallowed lactase necessarily survives unchanged, but it does not need to enter the bloodstream to help.',
+            evidenceAfter:{integrity:['Some activity may be reduced; enough may remain to act locally','neutral'], site:['Moving from stomach toward small intestine','neutral'], absorption:['Not intended for bloodstream absorption','good'], local:['Potential for local enzyme action remains','good'], secondary:['If lactose is digested, carbohydrate symptoms decrease','good']}
+          },
+          { type:'mcq', key:'intestine', title:'Checkpoint 4: Small intestine and absorption checkpoint', prompt:'What is the most important event in the small intestine?', options:[
+              'Lactase acts on lactose in the intestinal lumen, producing glucose and galactose that can be absorbed',
+              'Intact lactose is absorbed directly without digestion',
+              'Bile converts lactose into amino acids',
+              'Lactase must cross into the blood to digest lactose there'
+            ], correct:0,
+            feedback:'This is the key difference from insulin: the enzyme works in the GI tract, and the products of digestion—not the enzyme itself—are what get absorbed.',
+            evidenceAfter:{integrity:['Lactase may act locally; lactose is split into monosaccharides','good'], site:['Small-intestinal lumen / brush border','good'], absorption:['Glucose and galactose are absorbable; lactase itself does not need to be absorbed','good'], local:['Local lactose digestion occurs','good'], secondary:['Improved carbohydrate digestion reduces lactose-related GI symptoms','good']}
+          },
+          { type:'final', key:'verdict', title:'Checkpoint 5: Evidence-based verdict', prompt:'What is the best verdict on the original claim?', verdictOptions:['Supported','Partially supported','Not supported'], correctVerdict:0, evidenceOptions:[
+              'Lactase only has to act locally in the digestive tract; it does not need to reach body cells through the blood.',
+              'Lactose can be absorbed intact, so digestion is unnecessary.',
+              'In the small intestine, lactase can split lactose into glucose and galactose, which are absorbable.',
+              'Bile is the main enzyme that digests lactose.'
+            ], correctEvidence:[0,2],
+            feedback:'The claim is supported. A lactase tablet can help because it acts locally in the GI tract rather than needing to survive digestion and travel through the bloodstream.' }
+        ]
+      },
+      {
+        id:'ANT',
+        title:'How Do Antacids Help GERD—And What Else Might Change?',
+        claim:'“Antacids completely fix GERD and have no effect on digestion or nutrient absorption.”',
+        lead:'Analyze how an antacid changes the digestive environment and decide whether symptom relief is the same as fixing the underlying cause.',
+        contrast:'Proton pump inhibitor or H2 blocker',
+        comparePrompt:'Explain why an antacid can relieve acid symptoms quickly, but does not work the same way as a medication that lowers acid production over time.',
+        initialEvidence:{integrity:['Antacid compound ready to neutralize acid','good'], site:['Swallowed medication entering the stomach','neutral'], absorption:['Main benefit is local, not dependent on bloodstream delivery','good'], local:['Goal is to neutralize existing acid','good'], secondary:['Possible nutrient effects depend on repeated or long-term use','neutral']},
+        steps:[
+          { type:'mcq', key:'classify', title:'Checkpoint 1: Identify the substance', prompt:'What best describes an antacid in this case?', options:[
+              'A local acid-neutralizing compound',
+              'A protein hormone that must stay intact',
+              'A digestive enzyme that breaks lactose',
+              'A fiber supplement that increases stool bulk'
+            ], correct:0,
+            feedback:'An antacid mainly works locally by neutralizing acid already present in the stomach.' },
+          { type:'mcq', key:'success', title:'Checkpoint 2: Define success', prompt:'What must happen for an antacid to relieve typical GERD symptoms?', options:[
+              'It must be digested into amino acids first',
+              'It must lower the acidity of stomach contents so refluxed material is less irritating',
+              'It must rebuild the lower esophageal sphincter',
+              'It must increase bile release'
+            ], correct:1,
+            feedback:'An antacid does not repair the sphincter. It helps by making stomach contents less acidic, which may reduce irritation.' },
+          { type:'mcq', key:'stomach', title:'Checkpoint 3: Stomach checkpoint', prompt:'What is the best stomach-level effect of an antacid?', options:[
+              'It neutralizes some hydrochloric acid and raises stomach pH',
+              'It stimulates pepsin to digest protein faster',
+              'It turns lactose into glucose',
+              'It causes the stomach to secrete more acid immediately'
+            ], correct:0,
+            feedback:'Antacids act quickly on acid that is already present.',
+            evidenceAfter:{integrity:['Antacid has reacted with acid','good'], site:['Stomach lumen','neutral'], absorption:['Symptom relief does not require significant systemic absorption','good'], local:['Acidity is reduced; pH rises','good'], secondary:['Higher pH may reduce pepsin activity','neutral']}
+          },
+          { type:'mcq', key:'intestine', title:'Checkpoint 4: Small intestine and absorption checkpoint', prompt:'Which statement best captures the tradeoff of frequent or long-term acid neutralization?', options:[
+              'Lower acidity may reduce stomach irritation, but can also reduce protein denaturation and may interfere with absorption of some nutrients such as iron or food-bound vitamin B12',
+              'Neutralizing acid has no possible effect on digestion or nutrients',
+              'An antacid works mainly by improving villi height in the small intestine',
+              'Antacids permanently cure reflux by tightening the lower esophageal sphincter'
+            ], correct:0,
+            feedback:'Antacids can help symptoms, but symptom relief is not the same as fixing the cause. Reducing acidity may also change how some digestive processes work.',
+            evidenceAfter:{integrity:['Medication goal achieved locally; no special intact molecule needed','good'], site:['Stomach to upper small intestine','neutral'], absorption:['Primary effect is local, but some nutrient absorption may be altered indirectly','neutral'], local:['Acid is reduced; pepsin activity may be lower','neutral'], secondary:['Possible lower absorption of certain nutrients with frequent long-term use','neutral']}
+          },
+          { type:'final', key:'verdict', title:'Checkpoint 5: Evidence-based verdict', prompt:'What is the best verdict on the original claim?', verdictOptions:['Supported','Partially supported','Not supported'], correctVerdict:1, evidenceOptions:[
+              'In the stomach, an antacid can neutralize acid and reduce the acidity of refluxed contents.',
+              'Antacids permanently correct the lower esophageal sphincter problem.',
+              'Over time, changing stomach acidity can influence digestion and absorption of some nutrients.',
+              'Antacids only work after they are converted into hormones in the bloodstream.'
+            ], correctEvidence:[0,2],
+            feedback:'The claim is only partially supported. Antacids can relieve acid-related symptoms, but they do not completely fix GERD, and repeated acid reduction may affect digestion or some nutrient absorption.' }
+        ]
+      },
+      {
+        id:'PEN',
+        title:'Why Can a Pancreatic Enzyme Capsule Help Even Though Enzymes Are Proteins?',
+        claim:'“Swallowing pancreatic enzyme capsules can help digestion because the enzymes act in the small intestine, even if they never enter the bloodstream.”',
+        lead:'Follow a digestive enzyme supplement intended to release where the pancreas would normally deliver enzymes.',
+        contrast:'Regular insulin pill',
+        comparePrompt:'Explain why pancreatic enzymes can help without entering the bloodstream, while a hormone like insulin cannot.',
+        initialEvidence:{integrity:['Enzyme capsule intended for intestinal release','good'], site:['Swallowed with food','neutral'], absorption:['Not intended for bloodstream absorption','good'], local:['Goal is local digestion of food molecules','good'], secondary:['If enzyme release is inadequate, fats and fat-soluble vitamins may be affected','neutral']},
+        steps:[
+          { type:'mcq', key:'classify', title:'Checkpoint 1: Identify the substance', prompt:'What best describes this pancreatic enzyme capsule?', options:[
+              'A local digestive-enzyme treatment meant to work in the small intestine',
+              'A hormone that must bind receptors on body cells',
+              'A fiber supplement for the colon only',
+              'A mineral that only neutralizes stomach acid'
+            ], correct:0,
+            feedback:'These are digestive enzymes. Their job is to help digest food in the intestinal lumen.' },
+          { type:'mcq', key:'success', title:'Checkpoint 2: Define success', prompt:'What must happen for the capsule to help digestion?', options:[
+              'The enzymes must reach the bloodstream intact',
+              'The enzymes must be protected long enough to reach the small intestine and act on food there',
+              'The enzymes must completely shut down stomach acid production',
+              'The enzymes must move directly to the large intestine'
+            ], correct:1,
+            feedback:'The point is local intestinal action. Bloodstream delivery is not the goal.' },
+          { type:'mcq', key:'stomach', title:'Checkpoint 3: Stomach checkpoint', prompt:'Why is the stomach checkpoint important for this case?', options:[
+              'Stomach acid can damage enzymes, so the preparation needs protection or timing that helps the enzymes reach the small intestine',
+              'The stomach is where the enzymes must be absorbed into blood',
+              'The stomach converts the enzymes into bile acids',
+              'The stomach stores the enzymes until they are needed in muscle tissue'
+            ], correct:0,
+            feedback:'A protective coating or proper formulation helps digestive enzymes avoid being destroyed too early.',
+            evidenceAfter:{integrity:['Protected / intended to survive stomach passage long enough to help later','good'], site:['Passing through stomach toward small intestine','neutral'], absorption:['Still not intended for bloodstream absorption','good'], local:['No major benefit yet; action site is later','neutral'], secondary:['Preserving enzyme activity helps digestion downstream','good']}
+          },
+          { type:'mcq', key:'intestine', title:'Checkpoint 4: Small intestine and absorption checkpoint', prompt:'What is the most important small-intestine event?', options:[
+              'The enzymes are released and help digest carbohydrates, proteins, and fats in the lumen; the digested nutrients then become absorbable',
+              'The enzymes themselves must be absorbed into blood to digest the meal',
+              'Bicarbonate turns all nutrients into fiber',
+              'The enzymes cause the villi to disappear'
+            ], correct:0,
+            feedback:'The enzymes help create absorbable products; the enzymes themselves do not need to become circulating hormones.',
+            evidenceAfter:{integrity:['Enzymes active locally on food molecules','good'], site:['Small-intestinal lumen','good'], absorption:['Digested nutrients become absorbable; enzymes themselves do not need absorption','good'], local:['Digestive capacity improves locally','good'], secondary:['Improved fat digestion may support fat-soluble vitamin absorption','good']}
+          },
+          { type:'final', key:'verdict', title:'Checkpoint 5: Evidence-based verdict', prompt:'What is the best verdict on the original claim?', verdictOptions:['Supported','Partially supported','Not supported'], correctVerdict:0, evidenceOptions:[
+              'The enzymes are meant to work in the small-intestinal lumen, not as hormones in the blood.',
+              'The enzymes must be absorbed into muscle tissue to help digestion.',
+              'By helping digest nutrients into absorbable forms, the capsule can improve nutrient absorption even without enzyme absorption.',
+              'The large intestine is the main site where pancreatic enzymes digest food.'
+            ], correctEvidence:[0,2],
+            feedback:'The claim is supported. These enzymes are useful precisely because they act locally in the intestinal lumen and help create absorbable nutrient products.' }
+        ]
+      },
+      {
+        id:'CEL',
+        title:'What If Digestion Happens but Absorption Still Fails?',
+        claim:'“If food is digested normally, nutrient status should remain normal even when the small intestine is damaged by celiac disease.”',
+        lead:'Separate digestion from absorption by following nutrients that become chemically absorbable but encounter damaged villi.',
+        contrast:'Normal small-intestinal absorption',
+        comparePrompt:'Explain why normal digestion is not enough if the intestinal surface is damaged.',
+        initialEvidence:{integrity:['Meal is being digested normally','good'], site:['Food moving through GI tract','neutral'], absorption:['Absorption depends on healthy villi','neutral'], local:['Main issue is absorptive surface, not major failure of chewing or acid secretion','neutral'], secondary:['Iron, calcium, folate, and fat-soluble vitamin status may be affected if absorption falls','neutral']},
+        steps:[
+          { type:'mcq', key:'classify', title:'Checkpoint 1: Identify the main issue', prompt:'What best describes this case?', options:[
+              'An absorption disorder caused by small-intestinal damage',
+              'A stomach-acid disorder only',
+              'A hormone that must reach the bloodstream intact',
+              'A fiber supplement for constipation'
+            ], correct:0,
+            feedback:'The main issue is not whether food is digested into smaller parts. The main issue is whether digested nutrients can cross a damaged intestinal surface.' },
+          { type:'mcq', key:'success', title:'Checkpoint 2: Define success', prompt:'What must happen for the person to maintain normal nutrient status?', options:[
+              'Nutrients only need to reach the stomach',
+              'Nutrients must be digested and then absorbed across healthy villi into blood or lymph',
+              'All nutrients must remain in the intestinal lumen',
+              'Bile alone must digest the whole meal'
+            ], correct:1,
+            feedback:'Digestion and absorption are related but not identical. The products of digestion still must cross the intestinal lining.' },
+          { type:'mcq', key:'stomach', title:'Checkpoint 3: Stomach checkpoint', prompt:'What is the best interpretation of the stomach checkpoint in this case?', options:[
+              'Stomach digestion may be mostly normal, so the major problem has not appeared yet',
+              'The stomach usually repairs villi damage before the meal reaches the intestine',
+              'The stomach absorbs most vitamins and minerals directly',
+              'The stomach converts all food into blood'
+            ], correct:0,
+            feedback:'This case is helpful because it shows that a person can still have nutrient problems even if earlier digestive steps look normal.',
+            evidenceAfter:{integrity:['Food is being broken down appropriately so far','good'], site:['Stomach moving chyme onward','neutral'], absorption:['Still awaiting intestinal absorption step','neutral'], local:['No major stomach-level defect explains the nutrient problem','neutral'], secondary:['Nutrient risk comes later at the absorptive surface','neutral']}
+          },
+          { type:'mcq', key:'intestine', title:'Checkpoint 4: Small intestine and absorption checkpoint', prompt:'What best explains the small-intestine problem?', options:[
+              'Many nutrients may be in absorbable chemical form, but damaged villi reduce the surface available for absorption',
+              'Digested nutrients automatically become part of the bloodstream even if villi are damaged',
+              'Bicarbonate permanently cures villus injury',
+              'Villi damage improves absorption by making the intestine flatter'
+            ], correct:0,
+            feedback:'This is the heart of the case: digestion may proceed, but absorption can still fail.',
+            evidenceAfter:{integrity:['Many nutrients are chemically ready','good'], site:['Small-intestinal border with damaged villi','bad'], absorption:['Absorption is reduced by surface damage','bad'], local:['Main problem is malabsorption','bad'], secondary:['Possible lower absorption of iron, calcium, folate, and fat-soluble vitamins','bad']}
+          },
+          { type:'final', key:'verdict', title:'Checkpoint 5: Evidence-based verdict', prompt:'What is the best verdict on the original claim?', verdictOptions:['Supported','Partially supported','Not supported'], correctVerdict:2, evidenceOptions:[
+              'The stomach may look mostly normal, so digestion can begin appropriately.',
+              'If nutrients are chemically digested, absorption is guaranteed regardless of intestinal damage.',
+              'At the small-intestinal border, villus damage can reduce absorption even when nutrients are otherwise ready.',
+              'Celiac disease mainly improves iron and calcium absorption.'
+            ], correctEvidence:[0,2],
+            feedback:'The claim is not supported. Normal digestion does not guarantee normal nutrient status if the main problem is reduced absorptive surface in the small intestine.' }
+        ]
+      }
+    ];
 
-    <div class="criteria-grid">
-      <div class="criteria-card"><h3>Purpose</h3><p>Connect mechanical digestion, chemical digestion, digestive juices, nutrient absorption, and transport as one continuous process.</p></div>
-      <div class="criteria-card"><h3>Task</h3><p>Review a randomized meal and digestive challenge, complete six integrated decisions, and analyze your personalized report.</p></div>
-      <div class="criteria-card"><h3>Criteria</h3><p>Use before-and-after evidence from your own run, accurately apply Module 2 concepts, and explain your reasoning in your own words.</p></div>
-    </div>
+    const state = {
+      student:'',
+      simId:'',
+      caseObj:null,
+      stepIndex:0,
+      currentEvidence:null,
+      evidenceHistory:[],
+      responses:[],
+      fingerprint:''
+    };
 
-    <div class="panel">
-      <h3>About the dashboard</h3>
-      <p class="small">The four dashboard values are learning indicators, not clinical measurements. Higher values show greater progress toward appropriate particle size, pH conditions, absorbable nutrient forms, and successful transport.</p>
-    </div>
-  </section>
+    const progressLabels = ['Identify', 'Define Success', 'Stomach', 'Small Intestine', 'Verdict'];
 
-  <section id="caseScreen" class="screen" aria-labelledby="caseTitle">
-    <div class="panel">
-      <h2 id="caseTitle">Your Digestive Case File</h2>
-      <div class="case-layout">
-        <div id="mealCase" class="case-card"></div>
-        <div id="challengeCase" class="challenge-card"></div>
-      </div>
-      <div class="button-row">
-        <button type="button" class="btn-light" id="regenerateBtn">Generate a Different Case</button>
-        <button type="button" class="btn-primary" id="beginBtn">Begin Digestive Transit</button>
-      </div>
-    </div>
-  </section>
+    const startScreen = document.getElementById('startScreen');
+    const simScreen = document.getElementById('simScreen');
+    const reportScreen = document.getElementById('reportScreen');
+    const progressBar = document.getElementById('progressBar');
+    const caseIdTag = document.getElementById('caseIdTag');
+    const caseTitle = document.getElementById('caseTitle');
+    const caseClaim = document.getElementById('caseClaim');
+    const caseLead = document.getElementById('caseLead');
+    const questionTitle = document.getElementById('questionTitle');
+    const questionPrompt = document.getElementById('questionPrompt');
+    const questionBody = document.getElementById('questionBody');
+    const feedback = document.getElementById('feedback');
+    const submitBtn = document.getElementById('submitBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const evidencePanel = document.getElementById('evidencePanel');
 
-  <section id="simulationScreen" class="screen" aria-labelledby="sceneTitle">
-    <div class="panel">
-      <div class="label">Decision <span id="sceneNumber">1</span> of 6 · <span id="sceneLocation"></span></div>
-      <h2 id="sceneTitle"></h2>
-      <div class="progress" aria-label="Simulation progress"><div id="progressBar"></div></div>
-      <div id="digestiveMap" class="digestive-map" aria-label="Digestive pathway progress"></div>
-      <p id="scenePrompt"></p>
-
-      <div class="dashboard" aria-label="Current digestive dashboard">
-        <div class="meter-card">
-          <strong>Particle Breakdown</strong>
-          <div class="meter-track"><div id="particleFill" class="meter-fill"></div></div>
-          <div id="particleText" class="meter-number"></div>
-          <div id="particleStatus" class="meter-status"></div>
-        </div>
-        <div class="meter-card">
-          <strong>pH Suitability</strong>
-          <div class="meter-track"><div id="phFill" class="meter-fill"></div></div>
-          <div id="phText" class="meter-number"></div>
-          <div id="phStatus" class="meter-status"></div>
-        </div>
-        <div class="meter-card">
-          <strong>Nutrient Breakdown</strong>
-          <div class="meter-track"><div id="breakdownFill" class="meter-fill"></div></div>
-          <div id="breakdownText" class="meter-number"></div>
-          <div id="breakdownStatus" class="meter-status"></div>
-        </div>
-        <div class="meter-card">
-          <strong>Absorption &amp; Transport</strong>
-          <div class="meter-track"><div id="absorptionFill" class="meter-fill"></div></div>
-          <div id="absorptionText" class="meter-number"></div>
-          <div id="absorptionStatus" class="meter-status"></div>
-        </div>
-      </div>
-
-      <div class="molecule-board">
-        <h3>Meal Transit Board</h3>
-        <p class="small">The forms below update as your digestive-control decisions take effect.</p>
-        <div id="moleculeGrid" class="molecule-grid"></div>
-      </div>
-
-      <div id="choiceGrid" class="choice-grid"></div>
-
-      <div id="changePanel" class="change-panel" aria-live="polite">
-        <h3 style="margin-top:0">What Changed?</h3>
-        <p class="small">Save these before-and-after values for your final analysis.</p>
-        <div id="changeGrid" class="change-grid"></div>
-      </div>
-
-      <div id="organBox" class="organ-box" aria-live="polite">
-        <div id="organTitle" class="organ-title"></div>
-        <div id="organMessage"></div>
-        <div id="conceptTag" class="concept-tag"></div>
-      </div>
-
-      <div class="button-row">
-        <button type="button" class="btn-secondary btn-disabled" id="nextBtn" disabled>Continue</button>
-        <span id="nextStatus" class="small" role="status" aria-live="polite"></span>
-      </div>
-    </div>
-  </section>
-
-  <section id="reportScreen" class="screen" aria-labelledby="reportTitle">
-    <div class="panel">
-      <h2 id="reportTitle" tabindex="-1">Digestive Traffic Control Report</h2>
-      <div id="reportCase" class="report-grid"></div>
-    </div>
-
-    <div class="panel">
-      <h3>Instructor Snapshot</h3>
-      <div id="instructorSnapshot" class="report-grid"></div>
-      <p class="small">The fingerprint links this report to the specific decisions and values generated during the run.</p>
-      <div id="fingerprint" class="fingerprint"></div>
-    </div>
-
-    <div class="panel">
-      <h3>Digestive Bottleneck</h3>
-      <div id="bottleneck" class="score-card"></div>
-    </div>
-
-    <div class="panel">
-      <h3>Final Digestive Dashboard</h3>
-      <div id="reportScores" class="report-grid"></div>
-    </div>
-
-    <div class="panel">
-      <h3>Decision Timeline</h3>
-      <div id="reportTimeline" class="timeline"></div>
-    </div>
-
-    <div class="panel print-page-break">
-      <h3>Digestive Analysis</h3>
-      <p><strong>Answer both questions using your own case-file evidence.</strong> Recommended length: 80–140 words per response.</p>
-
-      <label for="studentName"><strong>Student name</strong></label>
-      <input type="text" id="studentName" placeholder="Enter your full name">
-
-      <div class="response-block">
-        <div class="notice">
-          <strong>Question 1: Digestive Bottleneck</strong><br>
-          Identify where digestion or absorption was most disrupted in your run. Cite before-and-after results for at least two dashboard indicators. Explain how your action affected the meal using at least two Module 2 concepts.
-        </div>
-        <label for="bottleneckResponse"><strong>Your response</strong></label>
-        <textarea id="bottleneckResponse" maxlength="1800" placeholder="Name the checkpoint and decision, cite two before-and-after values, and explain the response using Module 2 concepts."></textarea>
-        <div id="bottleneckWordCount" class="small" aria-live="polite">0 words</div>
-      </div>
-
-      <div class="response-block">
-        <div class="notice">
-          <strong>Question 2: Border Decision</strong><br>
-          Select one substance from your Meal Transit Board. Explain why it was or was not ready for absorption, what happened to it in your run, and what would likely occur if your assigned digestive challenge continued.
-        </div>
-        <label for="borderResponse"><strong>Your response</strong></label>
-        <textarea id="borderResponse" maxlength="1800" placeholder="Use one specific substance, its form or route, and your assigned digestive challenge."></textarea>
-        <div id="borderWordCount" class="small" aria-live="polite">0 words</div>
-      </div>
-
-      <details>
-        <summary>Assignment Rubric: 20 points</summary>
-        <table>
-          <thead><tr><th>Criterion</th><th>Full-credit evidence</th><th>Points</th></tr></thead>
-          <tbody>
-            <tr><td>Digestive control decisions</td><td>Uses mechanical actions, digestive juices, and enzymes appropriately during the assigned run.</td><td>6</td></tr>
-            <tr><td>Absorption and routing</td><td>Correctly distinguishes substances that are absorbable, need more digestion, or remain in the GI tract.</td><td>5</td></tr>
-            <tr><td>Run-specific evidence</td><td>Accurately cites before-and-after results for at least two dashboard indicators.</td><td>4</td></tr>
-            <tr><td>Nutrition explanation</td><td>Uses at least two relevant Module 2 concepts and makes a logical prediction.</td><td>3</td></tr>
-            <tr><td>Own reasoning and words</td><td>Responses are specific to the assigned meal, challenge, decisions, and data and demonstrate the student’s own reasoning.</td><td>2</td></tr>
-          </tbody>
-        </table>
-      </details>
-
-      <div class="button-row no-print">
-        <button type="button" class="btn-primary" id="printBtn">Save Report as PDF</button>
-        <button type="button" class="btn-light" id="restartBtn">Restart Simulation</button>
-      </div>
-    </div>
-  </section>
-</main>
-
-<script>
-const meals = [
-  {icon:"🥪",name:"Turkey Sandwich Meal",description:"Whole-grain turkey sandwich, apple slices, and milk.",components:{Carbohydrate:"Bread starch, fruit sugars, lactose",Protein:"Turkey and milk proteins",Fat:"Turkey and milk triglycerides",Fiber:"Whole grain and apple fiber",Water:"Milk and food moisture"}},
-  {icon:"🥑",name:"Bean and Rice Bowl",description:"Black beans, brown rice, avocado, vegetables, and salsa.",components:{Carbohydrate:"Rice and bean starch",Protein:"Bean proteins",Fat:"Avocado triglycerides",Fiber:"Beans, brown rice, and vegetables",Water:"Salsa and food moisture"}},
-  {icon:"🍳",name:"Egg and Toast Breakfast",description:"Eggs, whole-grain toast, orange slices, and water.",components:{Carbohydrate:"Toast starch and fruit sugars",Protein:"Egg proteins",Fat:"Egg-yolk triglycerides",Fiber:"Whole grain and orange fiber",Water:"Water and fruit moisture"}},
-  {icon:"🥣",name:"Yogurt Parfait",description:"Plain Greek yogurt, oats, berries, walnuts, and water.",components:{Carbohydrate:"Lactose, oat starch, and fruit sugars",Protein:"Yogurt and walnut proteins",Fat:"Walnut and dairy triglycerides",Fiber:"Oats and berry fiber",Water:"Water and yogurt moisture"}},
-  {icon:"🌯",name:"Chicken Burrito Bowl",description:"Chicken, rice, black beans, cheese, lettuce, and salsa.",components:{Carbohydrate:"Rice and bean starch",Protein:"Chicken, bean, and cheese proteins",Fat:"Cheese and chicken triglycerides",Fiber:"Beans, lettuce, and salsa",Water:"Salsa and food moisture"}},
-  {icon:"🥡",name:"Tofu Stir-Fry",description:"Tofu, brown rice, mixed vegetables, sesame oil, and water.",components:{Carbohydrate:"Brown-rice starch",Protein:"Soy protein",Fat:"Sesame-oil triglycerides",Fiber:"Brown rice and vegetables",Water:"Water and vegetable moisture"}},
-  {icon:"🐟",name:"Salmon Dinner",description:"Salmon, sweet potato, broccoli, and water.",components:{Carbohydrate:"Sweet-potato starch",Protein:"Salmon protein",Fat:"Salmon triglycerides",Fiber:"Sweet potato and broccoli",Water:"Water and food moisture"}},
-  {icon:"🥜",name:"Peanut Butter Banana Sandwich",description:"Peanut butter, whole-grain bread, banana, and water.",components:{Carbohydrate:"Bread starch and banana sugars",Protein:"Peanut and grain proteins",Fat:"Peanut triglycerides",Fiber:"Whole grain and banana fiber",Water:"Water and food moisture"}},
-  {icon:"🍲",name:"Lentil Soup Meal",description:"Lentil vegetable soup, whole-grain crackers, olive oil, and water.",components:{Carbohydrate:"Lentil and cracker starch",Protein:"Lentil proteins",Fat:"Olive-oil triglycerides",Fiber:"Lentils, vegetables, and whole grain",Water:"Soup broth and water"}},
-  {icon:"🍔",name:"Burger and Fries Meal",description:"Cheeseburger, French fries, and a soft drink.",components:{Carbohydrate:"Bun and potato starch; drink sugars",Protein:"Beef and cheese proteins",Fat:"Beef, cheese, and frying-oil triglycerides",Fiber:"Small amount from potato and bun",Water:"Soft drink and food moisture"}},
-  {icon:"🥙",name:"Hummus Vegetable Wrap",description:"Hummus, whole-grain wrap, vegetables, fruit, and water.",components:{Carbohydrate:"Wrap starch and fruit sugars",Protein:"Chickpea proteins",Fat:"Tahini and olive-oil triglycerides",Fiber:"Chickpeas, whole grain, vegetables, and fruit",Water:"Water and produce moisture"}},
-  {icon:"🍝",name:"Pasta and Meat Sauce",description:"Whole-grain pasta, meat sauce, side salad, and water.",components:{Carbohydrate:"Pasta starch",Protein:"Meat and grain proteins",Fat:"Meat and dressing triglycerides",Fiber:"Whole grain, tomato, and salad vegetables",Water:"Water and sauce moisture"}}
-];
-
-const malfunctions = [
-  {id:"chewing",stage:0,title:"Inadequate Chewing",description:"Large pieces remain after the first few bites, reducing surface area for later digestive actions."},
-  {id:"lowAcid",stage:1,title:"Low Stomach Acid",description:"The stomach is not reaching the acidic conditions needed for normal protein denaturation and pepsin activity."},
-  {id:"lowChurn",stage:1,title:"Reduced Stomach Churning",description:"The stomach is producing digestive juice, but mechanical mixing with the meal is weak."},
-  {id:"lowBicarb",stage:2,title:"Inadequate Bicarbonate Release",description:"Acidic chyme is entering the small intestine without enough alkaline bicarbonate to neutralize it."},
-  {id:"lowBile",stage:3,title:"Reduced Bile Delivery",description:"Large fat droplets are not being dispersed effectively in the watery small-intestinal environment."},
-  {id:"lowEnzymes",stage:3,title:"Reduced Pancreatic Enzymes",description:"Too little pancreatic amylase, protease, and lipase is reaching the small intestine."},
-  {id:"lowSegmentation",stage:3,title:"Reduced Segmentation",description:"Chyme is moving forward, but it is not mixing well with digestive juices or contacting the intestinal surface."},
-  {id:"villi",stage:4,title:"Damaged Intestinal Villi",description:"The intestinal surface area available for absorption is reduced. There is no instant digestive-control fix."}
-];
-
-const standardScenes = [
-  {
-    location:"Mouth",
-    map:0,
-    title:"Prepare the Meal for Transit",
-    prompt:"The meal has entered the mouth. Which action best combines mechanical and chemical digestion before swallowing?",
-    choices:[
-      {code:"M-A",title:"Chew thoroughly and mix with saliva",desc:"Reduce particle size, lubricate the food, and expose starch to salivary amylase.",meta:"Mechanical + chemical digestion",quality:3,effects:{particle:24,ph:5,breakdown:13,absorption:0},organ:"Mouth and salivary glands",feedback:"Chewing physically reduces the food, while saliva moistens it and salivary amylase begins starch digestion.",concept:"Mastication + salivary amylase"},
-      {code:"M-B",title:"Swallow after only a few chews",desc:"Move the large pieces into the esophagus with minimal mixing.",meta:"Limited preparation",quality:1,effects:{particle:7,ph:1,breakdown:3,absorption:0},organ:"Mouth",feedback:"The bolus can move forward, but larger particles provide less surface area for digestive juices later.",concept:"Mechanical digestion"},
-      {code:"M-C",title:"Try to absorb the intact meal in the mouth",desc:"Send starch, protein, fat, and fiber directly into circulation.",meta:"Premature absorption",quality:0,effects:{particle:0,ph:-4,breakdown:-2,absorption:0},organ:"Oral cavity",feedback:"Intact macronutrients are too large for absorption. The meal must first travel through the GI tract and be broken down.",concept:"Digestion before absorption"}
-    ]
-  },
-  {
-    location:"Stomach",
-    map:1,
-    title:"Create the Stomach Environment",
-    prompt:"The bolus has reached the stomach. Which control plan best prepares the mixed meal for the small intestine?",
-    choices:[
-      {code:"S-A",title:"Churn the meal and release HCl with pepsin",desc:"Mix food mechanically while acid supports protein denaturation and pepsin activity.",meta:"Appropriate stomach control",quality:3,effects:{particle:18,ph:18,breakdown:19,absorption:0},organ:"Stomach",feedback:"Stomach muscles churn the meal into chyme. Hydrochloric acid creates an acidic environment and supports protein digestion by pepsin.",concept:"Churning + HCl + pepsin"},
-      {code:"S-B",title:"Release acid but minimize churning",desc:"Create acidity without thoroughly mixing the meal with the digestive juice.",meta:"Partial chemical control",quality:2,effects:{particle:6,ph:14,breakdown:10,absorption:0},organ:"Stomach",feedback:"Acid supports protein denaturation, but weak mechanical mixing limits contact between food and digestive juices.",concept:"Chemical versus mechanical digestion"},
-      {code:"S-C",title:"Neutralize the stomach with bicarbonate",desc:"Make the stomach environment alkaline before chyme leaves.",meta:"Wrong region for neutralization",quality:0,effects:{particle:4,ph:-18,breakdown:-5,absorption:0},organ:"Stomach",feedback:"Bicarbonate is needed after acidic chyme reaches the small intestine. Neutralizing the stomach too early interferes with its acidic functions.",concept:"Region-specific pH"}
-    ]
-  },
-  {
-    location:"Duodenum",
-    map:2,
-    title:"Reset pH for Intestinal Digestion",
-    prompt:"Acidic chyme is entering the first part of the small intestine. What must happen before most pancreatic and brush-border enzymes can work effectively?",
-    choices:[
-      {code:"D-A",title:"Release bicarbonate into the small intestine",desc:"Neutralize the acidic chyme and create a more suitable environment for intestinal enzymes.",meta:"Acid-base management",quality:3,effects:{particle:2,ph:25,breakdown:7,absorption:0},organ:"Pancreas and small intestine",feedback:"Pancreatic bicarbonate neutralizes acidic chyme. Digestive enzymes function best within appropriate pH ranges.",concept:"Bicarbonate + enzyme pH"},
-      {code:"D-B",title:"Add more hydrochloric acid",desc:"Keep the intestinal contents strongly acidic.",meta:"Extends stomach conditions",quality:0,effects:{particle:0,ph:-22,breakdown:-7,absorption:0},organ:"Small intestine",feedback:"Strong acidity can reduce the activity of many small-intestinal enzymes. The pH must shift after the stomach.",concept:"Enzyme shape and pH"},
-      {code:"D-C",title:"Skip pH control and absorb the chyme",desc:"Attempt to move intact and partly digested nutrients through the intestinal lining.",meta:"Premature border crossing",quality:0,effects:{particle:0,ph:-10,breakdown:-3,absorption:2},organ:"Small intestine",feedback:"Most macronutrients are not yet in absorbable forms, and the environment is not ready for efficient intestinal digestion.",concept:"Digestion before absorption"}
-    ]
-  },
-  {
-    location:"Small Intestine",
-    map:2,
-    title:"Finish Digestion and Prepare the Border",
-    prompt:"The pH is shifting. Which plan best prepares carbohydrate, protein, and fat products for absorption at the same time?",
-    choices:[
-      {code:"I-A",title:"Use bile, pancreatic enzymes, and segmentation",desc:"Emulsify fat, break macronutrients into smaller units, and mix chyme with digestive juices and the intestinal surface.",meta:"Integrated intestinal control",quality:3,effects:{particle:10,ph:8,breakdown:31,absorption:5},organ:"Liver, gallbladder, pancreas, and small intestine",feedback:"Bile disperses fat droplets, pancreatic enzymes target the macronutrients, and segmentation increases mixing and contact.",concept:"Bile + enzymes + segmentation"},
-      {code:"I-B",title:"Use pancreatic enzymes without bile or mixing",desc:"Release enzymes but leave fat clustered and limit contact with the intestinal surface.",meta:"Incomplete intestinal plan",quality:2,effects:{particle:3,ph:4,breakdown:18,absorption:2},organ:"Pancreas",feedback:"Pancreatic enzymes help, but fat digestion and overall contact are less effective without bile and segmentation.",concept:"Accessory organs work together"},
-      {code:"I-C",title:"Move everything rapidly toward the colon",desc:"Reduce time for chemical digestion and contact with the absorptive surface.",meta:"Transit without preparation",quality:0,effects:{particle:0,ph:-4,breakdown:-5,absorption:-3},organ:"Small intestine",feedback:"Rapid movement limits the time available for digestion and absorption.",concept:"Segmentation and contact time"}
-    ]
-  },
-  {
-    location:"Intestinal Border",
-    map:2,
-    title:"Route the Absorbable Products",
-    prompt:"The meal has reached the intestinal border. Choose the traffic plan that routes only appropriately processed substances.",
-    routing:true,
-    choices:[
-      {code:"B-A",title:"Route by form and destination",desc:"Send monosaccharides, amino acids, and water into blood; send most fat products into lymph; move fiber forward.",meta:"Selective absorption",quality:3,effects:{particle:0,ph:2,breakdown:5,absorption:42},organ:"Villi, blood capillaries, and lymphatic vessels",feedback:"The intestinal lining selectively absorbs small nutrient products. Water-soluble nutrients generally enter blood, while most dietary fat products enter lymphatic transport. Fiber remains in the GI tract.",concept:"Absorption + blood/lymph transport"},
-      {code:"B-B",title:"Send every substance directly into blood",desc:"Attempt to place intact fiber and all fat products into blood with the water-soluble nutrients.",meta:"Nonselective routing",quality:0,effects:{particle:0,ph:0,breakdown:0,absorption:8},organ:"Intestinal border",feedback:"The intestinal border does not absorb every substance by the same route. Fiber remains in the tract, and most dietary fat follows lymphatic transport first.",concept:"Selective membrane transport"},
-      {code:"B-C",title:"Move every substance to the large intestine",desc:"Prevent absorption and send the entire meal forward as residue.",meta:"Missed absorption opportunity",quality:0,effects:{particle:0,ph:0,breakdown:-2,absorption:-5},organ:"Small intestine",feedback:"Most nutrient absorption normally occurs in the small intestine. Sending absorbable products forward wastes the meal’s available nutrients.",concept:"Small-intestinal absorption"}
-    ]
-  },
-  {
-    location:"Large Intestine",
-    map:3,
-    title:"Recover Water and Handle the Remainder",
-    prompt:"Most absorbable nutrients have had their opportunity to cross. What should happen to the remaining water, fiber, and residue?",
-    choices:[
-      {code:"L-A",title:"Absorb remaining water and move residue toward elimination",desc:"Recover water while fiber and unabsorbed material remain in the GI tract and form waste.",meta:"Appropriate large-intestinal function",quality:3,effects:{particle:0,ph:3,breakdown:5,absorption:15},organ:"Large intestine",feedback:"The large intestine absorbs remaining water and compacts material that was not absorbed for elimination.",concept:"Water recovery + elimination"},
-      {code:"L-B",title:"Try to absorb intact fiber into blood",desc:"Move the nondigestible carbohydrate through the intestinal border as a nutrient.",meta:"Fiber is not absorbed intact",quality:0,effects:{particle:0,ph:0,breakdown:0,absorption:1},organ:"Large intestine",feedback:"Dietary fiber is not digested into absorbable monosaccharides. It remains in the GI tract and contributes to stool.",concept:"Nondigestible carbohydrate"},
-      {code:"L-C",title:"Block water absorption completely",desc:"Send all remaining water out with the residue.",meta:"Reduced water recovery",quality:0,effects:{particle:0,ph:-2,breakdown:0,absorption:-8},organ:"Large intestine",feedback:"Water recovery is an important function of the large intestine. Blocking it increases water remaining in the waste.",concept:"Large-intestinal water absorption"}
-    ]
-  }
-];
-
-const challengeChoices = {
-  chewing:[
-    {code:"C-CH-A",title:"Increase mastication and saliva mixing",desc:"Continue chewing until particles are smaller and the bolus is well lubricated.",meta:"Correct the mouth bottleneck",quality:3,effects:{particle:29,ph:5,breakdown:14,absorption:0},organ:"Mouth and salivary glands",feedback:"More mastication increases surface area, while saliva lubricates the bolus and begins starch digestion.",concept:"Surface area + salivary amylase"},
-    {code:"C-CH-B",title:"Swallow the large pieces immediately",desc:"Rely on later organs to correct the limited mouth preparation.",meta:"Bottleneck continues",quality:0,effects:{particle:3,ph:0,breakdown:1,absorption:0},organ:"Mouth",feedback:"Later organs can continue digestion, but the meal begins transit with unnecessarily large particles.",concept:"Mechanical digestion"},
-    {code:"C-CH-C",title:"Add bile to the mouth",desc:"Use a fat emulsifier before the meal reaches the small intestine.",meta:"Wrong secretion and location",quality:0,effects:{particle:0,ph:-5,breakdown:0,absorption:0},organ:"Oral cavity",feedback:"Bile normally enters the small intestine. It does not replace chewing or salivary action in the mouth.",concept:"Accessory-organ location"}
-  ],
-  lowAcid:[
-    {code:"C-LA-A",title:"Restore HCl and pepsin while churning",desc:"Create acidic conditions and mix the meal with stomach digestive juice.",meta:"Correct the stomach bottleneck",quality:3,effects:{particle:17,ph:22,breakdown:20,absorption:0},organ:"Stomach",feedback:"Hydrochloric acid supports protein denaturation and pepsin activity. Churning improves contact with the meal.",concept:"HCl + pepsin + churning"},
-    {code:"C-LA-B",title:"Release bicarbonate into the stomach",desc:"Neutralize the stomach before protein digestion progresses.",meta:"Bottleneck worsens",quality:0,effects:{particle:4,ph:-22,breakdown:-7,absorption:0},organ:"Stomach",feedback:"Bicarbonate is needed in the small intestine, not as a replacement for stomach acid.",concept:"Region-specific pH"},
-    {code:"C-LA-C",title:"Move the meal forward without correction",desc:"Send weakly acidified chyme to the small intestine.",meta:"Partial digestion",quality:1,effects:{particle:7,ph:-8,breakdown:4,absorption:0},organ:"Stomach",feedback:"The meal can move forward, but protein preparation in the stomach remains limited.",concept:"Protein denaturation"}
-  ],
-  lowChurn:[
-    {code:"C-LC-A",title:"Restore churning while maintaining acid and pepsin",desc:"Mix the meal mechanically with the digestive juice already present.",meta:"Correct the mixing bottleneck",quality:3,effects:{particle:23,ph:16,breakdown:19,absorption:0},organ:"Stomach muscles",feedback:"Churning converts the bolus into chyme and increases contact between food, acid, and pepsin.",concept:"Mechanical + chemical digestion"},
-    {code:"C-LC-B",title:"Add more acid without improving mixing",desc:"Increase chemical secretion but leave weak mechanical contact.",meta:"Only part of the problem",quality:2,effects:{particle:4,ph:18,breakdown:9,absorption:0},organ:"Stomach",feedback:"Acid supports stomach chemistry, but poor churning still limits mixing and particle breakdown.",concept:"Mechanical versus chemical digestion"},
-    {code:"C-LC-C",title:"Speed the meal into the small intestine",desc:"Reduce stomach contact time instead of correcting the weak mixing.",meta:"Bottleneck continues",quality:0,effects:{particle:1,ph:-5,breakdown:-3,absorption:0},organ:"Stomach",feedback:"Rapid emptying does not replace the stomach’s mechanical mixing function.",concept:"Chyme formation"}
-  ],
-  lowBicarb:[
-    {code:"C-LB-A",title:"Release pancreatic bicarbonate",desc:"Neutralize the acidic chyme before relying on small-intestinal enzymes.",meta:"Correct the pH bottleneck",quality:3,effects:{particle:2,ph:31,breakdown:8,absorption:0},organ:"Pancreas and duodenum",feedback:"Bicarbonate raises pH suitability so pancreatic and brush-border enzymes can retain their functional shape.",concept:"Bicarbonate + enzyme pH"},
-    {code:"C-LB-B",title:"Add additional HCl",desc:"Keep the duodenum strongly acidic.",meta:"Bottleneck worsens",quality:0,effects:{particle:0,ph:-28,breakdown:-9,absorption:0},organ:"Duodenum",feedback:"Additional acid makes conditions less suitable for many intestinal enzymes.",concept:"Acid-base management"},
-    {code:"C-LB-C",title:"Use bile as the pH neutralizer",desc:"Attempt to replace bicarbonate with a fat-emulsifying secretion.",meta:"Wrong digestive role",quality:1,effects:{particle:0,ph:4,breakdown:4,absorption:0},organ:"Gallbladder and small intestine",feedback:"Bile supports fat emulsification, but it does not replace pancreatic bicarbonate as the main neutralizing control in this activity.",concept:"Different digestive juices, different roles"}
-  ],
-  lowBile:[
-    {code:"C-LBI-A",title:"Restore bile delivery with lipase and segmentation",desc:"Disperse the fat droplets and increase enzyme contact in the small intestine.",meta:"Correct the fat-processing bottleneck",quality:3,effects:{particle:9,ph:7,breakdown:27,absorption:4},organ:"Liver, gallbladder, pancreas, and small intestine",feedback:"Bile emulsifies large fat droplets, increasing surface area for lipase. Segmentation improves mixing.",concept:"Bile emulsification + lipase"},
-    {code:"C-LBI-B",title:"Use lipase without restoring bile",desc:"Apply the fat-digesting enzyme to large clustered droplets.",meta:"Partial correction",quality:2,effects:{particle:2,ph:4,breakdown:14,absorption:1},organ:"Pancreas",feedback:"Lipase can act, but contact is less efficient while fat remains clustered into large droplets.",concept:"Emulsification increases surface area"},
-    {code:"C-LBI-C",title:"Send the large fat droplets across the border",desc:"Attempt absorption before emulsification and digestion.",meta:"Premature absorption",quality:0,effects:{particle:0,ph:0,breakdown:-5,absorption:-3},organ:"Small intestine",feedback:"Large dietary-fat structures are not ready to cross the intestinal border.",concept:"Digestion before absorption"}
-  ],
-  lowEnzymes:[
-    {code:"C-LE-A",title:"Restore pancreatic amylase, proteases, and lipase",desc:"Target the meal’s carbohydrate, protein, and fat while segmentation mixes the chyme.",meta:"Correct the enzyme bottleneck",quality:3,effects:{particle:8,ph:7,breakdown:32,absorption:4},organ:"Pancreas and small intestine",feedback:"Digestive enzymes are substrate-specific. The mixed meal needs enzymes that target each macronutrient.",concept:"Enzyme specificity"},
-    {code:"C-LE-B",title:"Release bile without pancreatic enzymes",desc:"Disperse fat droplets but leave most chemical bond breakdown incomplete.",meta:"Only one digestive role",quality:1,effects:{particle:3,ph:3,breakdown:8,absorption:1},organ:"Gallbladder",feedback:"Bile helps emulsify fat, but it does not replace amylase, proteases, or lipase.",concept:"Bile is not an enzyme"},
-    {code:"C-LE-C",title:"Absorb the intact macronutrients",desc:"Attempt border crossing without the missing enzymes.",meta:"Bottleneck continues",quality:0,effects:{particle:0,ph:0,breakdown:-6,absorption:-4},organ:"Small intestine",feedback:"Intact starch, proteins, and large fat structures are not ready for absorption.",concept:"Absorbable nutrient forms"}
-  ],
-  lowSegmentation:[
-    {code:"C-LS-A",title:"Restore segmentation and maintain digestive secretions",desc:"Mix chyme repeatedly with enzymes, bile, and the intestinal surface.",meta:"Correct the contact bottleneck",quality:3,effects:{particle:13,ph:7,breakdown:27,absorption:7},organ:"Small-intestinal smooth muscle",feedback:"Segmentation mixes rather than simply propels. It improves contact with digestive juices and absorptive surfaces.",concept:"Segmentation versus peristalsis"},
-    {code:"C-LS-B",title:"Increase forward peristalsis",desc:"Push the meal through faster without improving local mixing.",meta:"Transit without contact",quality:0,effects:{particle:0,ph:-3,breakdown:-5,absorption:-5},organ:"Small intestine",feedback:"Faster forward movement can reduce the time available for digestion and absorption.",concept:"Peristalsis versus segmentation"},
-    {code:"C-LS-C",title:"Add enzymes but leave mixing weak",desc:"Increase chemical capacity without distributing it effectively through the chyme.",meta:"Partial correction",quality:2,effects:{particle:2,ph:5,breakdown:17,absorption:2},organ:"Pancreas",feedback:"Enzymes help, but weak segmentation limits contact with the meal and the intestinal border.",concept:"Chemical digestion needs contact"}
-  ],
-  villi:[
-    {code:"C-V-A",title:"Route only ready products and maximize contact time",desc:"Use the remaining absorptive surface appropriately while recognizing that total absorption will be reduced.",meta:"Best available response",quality:3,effects:{particle:0,ph:2,breakdown:4,absorption:23},organ:"Intestinal villi",feedback:"Damaged villi reduce surface area. The body cannot simply force intact nutrients across, so even the best routing plan produces lower absorption.",concept:"Surface area + selective absorption"},
-    {code:"C-V-B",title:"Force all substances through the damaged border",desc:"Attempt to absorb intact fiber and incompletely digested macronutrients.",meta:"Nonselective routing",quality:0,effects:{particle:0,ph:0,breakdown:-2,absorption:3},organ:"Intestinal border",feedback:"Damage does not remove the border’s selectivity. Large or nondigestible substances still cannot be absorbed appropriately.",concept:"Selective membrane transport"},
-    {code:"C-V-C",title:"Move the entire meal directly to the colon",desc:"Avoid the damaged border by skipping small-intestinal absorption.",meta:"Major nutrient loss",quality:0,effects:{particle:0,ph:0,breakdown:-4,absorption:-7},organ:"Small intestine",feedback:"Most nutrient absorption normally occurs in the small intestine. Skipping it sends useful nutrient products forward unabsorbed.",concept:"Small-intestinal absorption"}
-  ]
-};
-
-let currentMeal = null;
-let currentMalfunction = null;
-let currentScenes = [];
-let currentScene = 0;
-let selectedChoice = null;
-let simId = "";
-let state = {};
-let timeline = [];
-const PREVIOUS_CASE_KEY = "digestiveTrafficPreviousCase";
-
-function sample(arr){return arr[Math.floor(Math.random()*arr.length)]}
-function shuffle(arr){const copy=[...arr];for(let i=copy.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[copy[i],copy[j]]=[copy[j],copy[i]];}return copy}
-function clamp(n,min=0,max=100){return Math.max(min,Math.min(max,n))}
-function makeId(){return "DTC-"+Date.now().toString(36).slice(-5).toUpperCase()+"-"+Math.random().toString(36).slice(2,6).toUpperCase()}
-function copyObject(obj){return JSON.parse(JSON.stringify(obj))}
-function esc(text){return String(text).replace(/[&<>'"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[ch]))}
-function showScreen(id){
-  document.querySelectorAll(".screen").forEach(screen=>screen.classList.remove("active"));
-  const target=document.getElementById(id);
-  if(!target)return;
-  target.classList.add("active");
-  try{window.scrollTo(0,0)}catch(error){}
-}
-function readPrevious(){try{return JSON.parse(sessionStorage.getItem(PREVIOUS_CASE_KEY)||"null")}catch(error){return null}}
-function savePrevious(){try{sessionStorage.setItem(PREVIOUS_CASE_KEY,JSON.stringify({meal:currentMeal.name,malfunction:currentMalfunction.id}))}catch(error){}}
-
-function generateCase(){
-  const previous=readPrevious();
-  const mealPool=meals.filter(m=>!previous||m.name!==previous.meal);
-  const malfunctionPool=malfunctions.filter(m=>!previous||m.id!==previous.malfunction);
-  currentMeal=sample(mealPool.length?mealPool:meals);
-  currentMalfunction=sample(malfunctionPool.length?malfunctionPool:malfunctions);
-  renderCase();
-}
-
-function renderCase(){
-  document.getElementById("mealCase").innerHTML=`
-    <div class="meal-title"><div class="meal-icon" aria-hidden="true">${currentMeal.icon}</div><div><span class="label">Assigned mixed meal</span><h3 style="margin:.1rem 0">${esc(currentMeal.name)}</h3><p style="margin:.25rem 0">${esc(currentMeal.description)}</p></div></div>
-    <div class="component-grid">${Object.entries(currentMeal.components).map(([key,value])=>`<div class="component"><span class="label">${esc(key)}</span><span class="value">${esc(value)}</span></div>`).join("")}</div>`;
-  document.getElementById("challengeCase").innerHTML=`
-    <span class="label">Assigned digestive challenge</span>
-    <div class="challenge-title">⚠ ${esc(currentMalfunction.title)}</div>
-    <p>${esc(currentMalfunction.description)}</p>
-    <p class="small"><strong>The challenge will appear inside the normal digestive decision at the affected checkpoint.</strong></p>`;
-}
-
-function buildScenes(){
-  currentScenes=standardScenes.map(scene=>copyObject(scene));
-  const challengeStage=currentMalfunction.stage;
-  currentScenes[challengeStage].prompt=`<strong>Digestive challenge active:</strong> ${esc(currentMalfunction.description)} ${currentScenes[challengeStage].prompt}`;
-  currentScenes[challengeStage].choices=copyObject(challengeChoices[currentMalfunction.id]);
-  currentScenes[challengeStage].challenge=true;
-  currentScenes[challengeStage].title=currentScenes[challengeStage].title+" — Challenge Response";
-  currentScenes.forEach(scene=>{scene.choices=shuffle(scene.choices)});
-}
-
-function startSimulation(){
-  simId=makeId();
-  document.getElementById("simIdHeader").textContent=`Simulation ID: ${simId}`;
-  state={particle:8,ph:55,breakdown:5,absorption:0,routeQuality:null};
-  timeline=[];
-  currentScene=0;
-  selectedChoice=null;
-  buildScenes();
-  savePrevious();
-  showScreen("simulationScreen");
-  renderScene();
-}
-
-function statusFor(metric,value){
-  if(metric==="particle") return value<25?"Large pieces remain":value<55?"Moderate particle reduction":value<80?"Small particles":"Extensive particle reduction";
-  if(metric==="ph") return value<30?"Unsuitable for this region":value<60?"Partly suitable":value<82?"Suitable conditions":"Strong pH control";
-  if(metric==="breakdown") return value<25?"Mostly intact macronutrients":value<55?"Partial chemical breakdown":value<80?"Many small products":"Mostly absorbable forms";
-  return value<20?"Little absorbed":value<50?"Some products transported":value<80?"Most ready products routed":"Extensive absorption and transport";
-}
-
-function updateMeters(){
-  const fields=["particle","ph","breakdown","absorption"];
-  fields.forEach(metric=>{
-    const value=Math.round(state[metric]);
-    document.getElementById(metric+"Fill").style.width=value+"%";
-    document.getElementById(metric+"Text").textContent=value+" / 100";
-    document.getElementById(metric+"Status").textContent=statusFor(metric,value);
-  });
-}
-
-function routeChip(text,type="wait"){return `<span class="route-chip ${type}">${esc(text)}</span>`}
-function moleculeForms(){
-  const b=state.breakdown;
-  const a=state.absorption;
-  const routed=a>=25;
-  const routeGood=state.routeQuality===3;
-  const items=[];
-
-  let carb=b<25?"Starch and disaccharides":b<55?"Shorter starch fragments and sugars":b<78?"Mixed sugars; some monosaccharides":"Monosaccharides ready to cross";
-  let protein=b<25?"Intact proteins":b<55?"Polypeptides and peptides":b<78?"Peptides with some amino acids":"Amino acids ready to cross";
-  let fat=b<38?"Large triglyceride droplets":b<68?"Emulsified droplets with partial digestion":"Fat digestion products ready for transport";
-  let water="Free water in the GI contents";
-  let fiber="Nondigestible fiber remains intact";
-
-  if(routed){
-    if(routeGood){
-      carb="Monosaccharides routed to blood";
-      protein="Amino acids routed to blood";
-      fat="Most fat products routed to lymph";
-      water="Water crossing into blood";
-      fiber="Fiber moving toward large intestine";
-    }else{
-      carb+="; routing was incomplete";
-      protein+="; routing was incomplete";
-      fat+="; routing was incomplete";
+    function clone(obj){ return JSON.parse(JSON.stringify(obj)); }
+    function shuffle(array){
+      const arr = array.slice();
+      for(let i=arr.length-1;i>0;i--){
+        const j=Math.floor(Math.random()*(i+1));
+        [arr[i],arr[j]]=[arr[j],arr[i]];
+      }
+      return arr;
     }
-  }
+    function makeId(prefix){
+      const rand = Math.random().toString(36).slice(2,7).toUpperCase();
+      const stamp = new Date();
+      const pad = n => String(n).padStart(2,'0');
+      return `${prefix}-${stamp.getFullYear()}${pad(stamp.getMonth()+1)}${pad(stamp.getDate())}-${pad(stamp.getHours())}${pad(stamp.getMinutes())}${pad(stamp.getSeconds())}-${rand}`;
+    }
 
-  items.push({icon:"⬡",name:"Carbohydrate",form:carb,chip:routed&&routeGood?routeChip("Blood","blood"):b>=78?routeChip("Ready to absorb"):routeChip("Needs processing","wait")});
-  items.push({icon:"〰",name:"Protein",form:protein,chip:routed&&routeGood?routeChip("Blood","blood"):b>=78?routeChip("Ready to absorb"):routeChip("Needs processing","wait")});
-  items.push({icon:"◉",name:"Fat",form:fat,chip:routed&&routeGood?routeChip("Lymph","lymph"):b>=68?routeChip("Ready to route"):routeChip("Needs bile/enzyme action","wait")});
-  items.push({icon:"💧",name:"Water",form:water,chip:routed&&routeGood?routeChip("Blood","blood"):routeChip("Absorbable","blood")});
-  items.push({icon:"🌾",name:"Fiber",form:fiber,chip:routed&&routeGood?routeChip("Move forward","wait"):routeChip("Not absorbed intact","block")});
-  return items;
-}
+    function startCase(){
+      state.student = document.getElementById('studentName').value.trim() || 'Not entered';
+      state.caseObj = clone(casePool[Math.floor(Math.random()*casePool.length)]);
+      state.simId = makeId(state.caseObj.id);
+      state.stepIndex = 0;
+      state.currentEvidence = clone(state.caseObj.initialEvidence);
+      state.evidenceHistory = [{location:'Start', snapshot:clone(state.currentEvidence)}];
+      state.responses = [];
+      state.fingerprint = '';
+      startScreen.classList.add('hidden');
+      reportScreen.classList.add('hidden');
+      simScreen.classList.remove('hidden');
+      caseIdTag.textContent = `Case ${state.caseObj.id} • ${state.simId}`;
+      caseTitle.textContent = state.caseObj.title;
+      caseClaim.textContent = state.caseObj.claim;
+      caseLead.textContent = state.caseObj.lead;
+      renderProgress();
+      renderEvidence();
+      renderStep();
+      window.scrollTo({top:0,behavior:'smooth'});
+    }
 
-function renderMolecules(){
-  document.getElementById("moleculeGrid").innerHTML=moleculeForms().map(item=>`<div class="molecule-card"><div class="molecule-icon" aria-hidden="true">${item.icon}</div><div class="molecule-name">${item.name}</div><div class="molecule-form">${item.form}</div>${item.chip}</div>`).join("");
-}
+    function renderProgress(){
+      progressBar.innerHTML='';
+      progressLabels.forEach((label,idx)=>{
+        const div = document.createElement('div');
+        div.className='prog';
+        if(idx<state.stepIndex) div.classList.add('done');
+        if(idx===state.stepIndex) div.classList.add('active');
+        div.textContent = `${idx+1}. ${label}`;
+        progressBar.appendChild(div);
+      });
+    }
 
-function renderMap(){
-  const labels=["Mouth","Stomach","Small Intestine","Large Intestine"];
-  const activeMap=currentScenes[currentScene].map;
-  document.getElementById("digestiveMap").innerHTML=labels.map((label,index)=>{
-    let cls="map-step";
-    if(index<activeMap) cls+=" complete";
-    if(index===activeMap) cls+=" current";
-    return `<div class="${cls}">${index===0?"👄":index===1?"🧪":index===2?"🚦":"💧"}<br>${label}</div>`;
-  }).join("");
-}
+    function renderEvidence(){
+      evidencePanel.innerHTML='';
+      const labels = {
+        integrity:'Molecule integrity',
+        site:'Site of action',
+        absorption:'Absorption potential',
+        local:'Local GI effect',
+        secondary:'Secondary nutrient impact'
+      };
+      Object.keys(labels).forEach(key=>{
+        const [value,status] = state.currentEvidence[key];
+        const div = document.createElement('div');
+        div.className='evidence-item';
+        div.innerHTML = `<div class="evidence-label">${labels[key]}</div><div class="evidence-value">${value}</div><div class="status ${status}">${status==='good'?'Supports success':status==='bad'?'Challenges success':'Neutral / interpret in context'}</div>`;
+        evidencePanel.appendChild(div);
+      });
+    }
 
-function renderScene(){
-  selectedChoice=null;
-  const scene=currentScenes[currentScene];
-  document.getElementById("sceneNumber").textContent=currentScene+1;
-  document.getElementById("sceneLocation").textContent=scene.location;
-  document.getElementById("sceneTitle").textContent=scene.title;
-  document.getElementById("scenePrompt").innerHTML=scene.prompt;
-  document.getElementById("progressBar").style.width=((currentScene)/currentScenes.length*100)+"%";
-  document.getElementById("changePanel").classList.remove("show");
-  document.getElementById("organBox").classList.remove("show");
-  const nextBtn=document.getElementById("nextBtn");
-  nextBtn.disabled=true;
-  nextBtn.classList.add("btn-disabled");
-  nextBtn.textContent=currentScene===currentScenes.length-1?"View Report":"Continue";
-  document.getElementById("nextStatus").textContent="Select one option to continue.";
-  renderMap();updateMeters();renderMolecules();
-  document.getElementById("choiceGrid").innerHTML=scene.choices.map((choice,index)=>`<button type="button" class="choice-card" data-index="${index}"><div class="choice-title"><span aria-hidden="true">▸</span><span>${esc(choice.title)}</span></div><div class="choice-desc">${esc(choice.desc)}</div><span class="choice-meta">${scene.challenge?"Challenge response":"Digestive-control option"}</span></button>`).join("");
-  document.querySelectorAll(".choice-card").forEach(btn=>btn.addEventListener("click",()=>selectChoice(Number(btn.dataset.index))));
-}
+    function renderStep(){
+      renderProgress();
+      feedback.className='hidden';
+      feedback.innerHTML='';
+      submitBtn.classList.remove('hidden');
+      nextBtn.classList.add('hidden');
+      const step = state.caseObj.steps[state.stepIndex];
+      questionTitle.textContent = step.title;
+      questionPrompt.textContent = step.prompt;
+      questionBody.innerHTML='';
 
-function adjustRoutingEffect(choice,effects){
-  if(!currentScenes[currentScene].routing)return effects;
-  const readiness=Math.max(.35,Math.min(1,state.breakdown/82));
-  effects.absorption=Math.round(effects.absorption*readiness);
-  return effects;
-}
+      if(step.type==='mcq'){
+        const wrap = document.createElement('div');
+        wrap.className='options';
+        step.options.forEach((opt,idx)=>{
+          const id = `opt-${state.stepIndex}-${idx}`;
+          const label = document.createElement('label');
+          label.className='option';
+          label.setAttribute('for',id);
+          label.innerHTML = `<input type="radio" name="stepOption" id="${id}" value="${idx}"> ${opt}`;
+          wrap.appendChild(label);
+        });
+        questionBody.appendChild(wrap);
+      } else if(step.type==='final'){
+        const verdictBlock = document.createElement('div');
+        verdictBlock.innerHTML = '<h4>Select your verdict</h4>';
+        const verdictWrap = document.createElement('div');
+        verdictWrap.className='options';
+        step.verdictOptions.forEach((opt,idx)=>{
+          const id = `ver-${idx}`;
+          const label = document.createElement('label');
+          label.className='option';
+          label.setAttribute('for',id);
+          label.innerHTML = `<input type="radio" name="verdictOption" id="${id}" value="${idx}"> ${opt}`;
+          verdictWrap.appendChild(label);
+        });
+        verdictBlock.appendChild(verdictWrap);
 
-function selectChoice(index){
-  if(selectedChoice!==null)return;
-  selectedChoice=index;
-  const scene=currentScenes[currentScene];
-  const choice=scene.choices[index];
-  const before={particle:state.particle,ph:state.ph,breakdown:state.breakdown,absorption:state.absorption};
-  const effects=adjustRoutingEffect(choice,{...choice.effects});
-  Object.keys(effects).forEach(metric=>state[metric]=clamp(state[metric]+effects[metric]));
-  if(scene.routing)state.routeQuality=choice.quality;
-  const after={particle:state.particle,ph:state.ph,breakdown:state.breakdown,absorption:state.absorption};
-  timeline.push({sceneIndex:currentScene,location:scene.location,title:scene.title,challenge:!!scene.challenge,choice:choice.title,code:choice.code,quality:choice.quality,before,after,feedback:choice.feedback,concept:choice.concept});
+        const evidenceBlock = document.createElement('div');
+        evidenceBlock.innerHTML = '<h4>Choose the two strongest pieces of evidence</h4><div class="small">Select exactly two.</div>';
+        const evidenceWrap = document.createElement('div');
+        evidenceWrap.className='options';
+        step.evidenceOptions.forEach((opt,idx)=>{
+          const id = `ev-${idx}`;
+          const label = document.createElement('label');
+          label.className='option';
+          label.setAttribute('for',id);
+          label.innerHTML = `<input type="checkbox" class="evidenceCheck" id="${id}" value="${idx}"> ${opt}`;
+          evidenceWrap.appendChild(label);
+        });
+        evidenceBlock.appendChild(evidenceWrap);
+        questionBody.appendChild(verdictBlock);
+        questionBody.appendChild(evidenceBlock);
+      }
+    }
 
-  document.querySelectorAll(".choice-card").forEach((btn,i)=>{btn.disabled=true;if(i===index)btn.classList.add("selected")});
-  renderChanges(before,after);
-  document.getElementById("organTitle").textContent=choice.organ+" responds";
-  document.getElementById("organMessage").textContent=choice.feedback;
-  document.getElementById("conceptTag").textContent=choice.concept;
-  document.getElementById("organBox").classList.add("show");
-  updateMeters();renderMolecules();
-  const nextBtn=document.getElementById("nextBtn");
-  nextBtn.disabled=false;
-  nextBtn.classList.remove("btn-disabled");
-  document.getElementById("nextStatus").textContent=currentScene===currentScenes.length-1?"Your report is ready to open.":"Your decision is recorded.";
-}
+    function disableInputs(){
+      questionBody.querySelectorAll('input').forEach(el=>el.disabled=true);
+    }
 
-function renderChanges(before,after){
-  const labels={particle:"Particle Breakdown",ph:"pH Suitability",breakdown:"Nutrient Breakdown",absorption:"Absorption & Transport"};
-  document.getElementById("changeGrid").innerHTML=Object.keys(labels).map(metric=>{
-    const delta=Math.round(after[metric]-before[metric]);
-    const cls=delta>0?"change-good":delta<0?"change-watch":"change-neutral";
-    return `<div class="change-card"><span class="label">${labels[metric]}</span><div class="change-values"><span>${Math.round(before[metric])}</span><span class="change-arrow">→</span><span class="${cls}">${Math.round(after[metric])}</span></div><div class="small ${cls}">${delta>0?"+":""}${delta}</div></div>`;
-  }).join("");
-  document.getElementById("changePanel").classList.add("show");
-}
+    function submitCurrent(){
+      const step = state.caseObj.steps[state.stepIndex];
+      if(step.type==='mcq'){
+        const selected = questionBody.querySelector('input[name="stepOption"]:checked');
+        if(!selected){ alert('Please select an answer before submitting.'); return; }
+        const choice = Number(selected.value);
+        const isCorrect = choice===step.correct;
+        state.responses.push({step:step.title, type:'mcq', prompt:step.prompt, studentAnswer:step.options[choice], correctAnswer:step.options[step.correct], correct:isCorrect, points:isCorrect?1:0, maxPoints:1});
+        if(step.evidenceAfter){
+          state.currentEvidence = clone(step.evidenceAfter);
+          const location = step.key==='stomach' ? 'After stomach checkpoint' : step.key==='intestine' ? 'After small-intestine checkpoint' : `After ${step.title}`;
+          state.evidenceHistory.push({location, snapshot:clone(state.currentEvidence)});
+          renderEvidence();
+        }
+        feedback.className = `feedback ${isCorrect?'correct':'incorrect'}`;
+        feedback.innerHTML = `<strong>${isCorrect?'Correct.':'Not quite.'}</strong> ${step.feedback}<br><br><strong>Your answer:</strong> ${step.options[choice]}<br><strong>Best answer:</strong> ${step.options[step.correct]}`;
+      } else {
+        const verdict = questionBody.querySelector('input[name="verdictOption"]:checked');
+        const checks = Array.from(questionBody.querySelectorAll('.evidenceCheck:checked')).map(el=>Number(el.value));
+        if(!verdict){ alert('Please select a verdict.'); return; }
+        if(checks.length!==2){ alert('Please select exactly two evidence statements.'); return; }
+        const verdictChoice = Number(verdict.value);
+        const verdictCorrect = verdictChoice===step.correctVerdict;
+        const exactEvidence = step.correctEvidence.every(v=>checks.includes(v)) && checks.every(v=>step.correctEvidence.includes(v));
+        const points = (verdictCorrect?1:0) + (exactEvidence?1:0);
+        state.responses.push({step:step.title, type:'final', prompt:step.prompt, studentAnswer:`Verdict: ${step.verdictOptions[verdictChoice]} | Evidence: ${checks.map(i=>step.evidenceOptions[i]).join(' || ')}`,
+          correctAnswer:`Verdict: ${step.verdictOptions[step.correctVerdict]} | Evidence: ${step.correctEvidence.map(i=>step.evidenceOptions[i]).join(' || ')}`,
+          correct: verdictCorrect && exactEvidence, points, maxPoints:2});
+        feedback.className = `feedback ${(verdictCorrect && exactEvidence)?'correct':'incorrect'}`;
+        feedback.innerHTML = `<strong>${(verdictCorrect && exactEvidence)?'Strong case verdict.':'Review the evidence.'}</strong> ${step.feedback}<br><br><strong>Best verdict:</strong> ${step.verdictOptions[step.correctVerdict]}<br><strong>Best evidence:</strong><ul><li>${step.correctEvidence.map(i=>step.evidenceOptions[i]).join('</li><li>')}</li></ul>`;
+        state.evidenceHistory.push({location:'Final verdict prepared', snapshot:clone(state.currentEvidence)});
+      }
 
-function openReport(){
-  const nextBtn=document.getElementById("nextBtn");
-  nextBtn.disabled=true;
-  nextBtn.classList.add("btn-disabled");
-  nextBtn.textContent="Opening Report…";
-  document.getElementById("nextStatus").textContent="Preparing your personalized report.";
+      disableInputs();
+      submitBtn.classList.add('hidden');
+      nextBtn.classList.remove('hidden');
+      feedback.classList.remove('hidden');
+    }
 
-  try{
-    renderReport();
-  }catch(error){
-    console.error("Unable to build the full report:",error);
-    const reportCase=document.getElementById("reportCase");
-    reportCase.innerHTML=`
-      <div class="score-card">
-        <span class="label">Simulation report</span>
-        <span class="value">Your run is complete.</span>
-        <p class="small">The detailed report encountered an error, but your recorded decisions are listed below.</p>
-      </div>`;
-    document.getElementById("reportTimeline").innerHTML=timeline.map((item,index)=>`
-      <div class="timeline-item">
-        <span class="label">Decision ${index+1} · ${esc(item.location)}</span>
-        <strong>${esc(item.choice)}</strong>
-        <div class="timeline-stats">Particle ${formatDelta(item,"particle")} · pH ${formatDelta(item,"ph")} · Breakdown ${formatDelta(item,"breakdown")} · Absorption ${formatDelta(item,"absorption")}</div>
-      </div>`).join("");
-  }
+    function nextStep(){
+      state.stepIndex += 1;
+      if(state.stepIndex >= state.caseObj.steps.length){
+        buildReport();
+        simScreen.classList.add('hidden');
+        reportScreen.classList.remove('hidden');
+        window.scrollTo({top:0,behavior:'smooth'});
+      } else {
+        renderStep();
+      }
+    }
 
-  showScreen("reportScreen");
-  const reportTitle=document.getElementById("reportTitle");
-  if(reportTitle){try{reportTitle.focus({preventScroll:true})}catch(error){reportTitle.focus()}}
-}
+    function buildReport(){
+      const totalPoints = state.responses.reduce((a,b)=>a+b.points,0);
+      const maxPoints = state.responses.reduce((a,b)=>a+b.maxPoints,0);
+      state.fingerprint = state.responses.map((r,idx)=>`${idx+1}${r.points}/${r.maxPoints}`).join('-');
 
-function nextScene(){
-  if(selectedChoice===null)return;
-  if(currentScene<currentScenes.length-1){
-    currentScene++;
-    renderScene();
-  }else{
-    openReport();
-  }
-}
+      document.getElementById('rStudent').textContent = state.student;
+      document.getElementById('rSimId').textContent = state.simId;
+      document.getElementById('rFingerprint').textContent = state.fingerprint;
+      document.getElementById('rCase').textContent = state.caseObj.title;
+      document.getElementById('rClaim').textContent = state.caseObj.claim;
+      document.getElementById('scoreBig').textContent = `${totalPoints} / ${maxPoints}`;
+      document.getElementById('scoreText').textContent = 'This score reflects the decision checkpoints only. The short-answer responses should be graded with the rubric.';
 
-function qualityLabel(score){return score>=16?"Strong digestive-control pattern":score>=11?"Mostly effective with some missed opportunities":"Several digestive bottlenecks remained"}
-function formatDelta(item,metric){return `${Math.round(item.before[metric])} → ${Math.round(item.after[metric])}`}
+      const dtable = document.getElementById('decisionTable');
+      dtable.innerHTML = '<tr><th>Checkpoint</th><th>Your answer</th><th>Best answer</th><th>Score</th></tr>';
+      state.responses.forEach(r=>{
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${r.step}</td><td>${r.studentAnswer}</td><td>${r.correctAnswer}</td><td>${r.points}/${r.maxPoints}</td>`;
+        dtable.appendChild(tr);
+      });
 
-function renderReport(){
-  document.getElementById("reportCase").innerHTML=`
-    <div class="score-card"><span class="label">Assigned meal</span><span class="value">${currentMeal.icon} ${esc(currentMeal.name)}</span><p class="small">${esc(currentMeal.description)}</p></div>
-    <div class="score-card"><span class="label">Assigned challenge</span><span class="value">${esc(currentMalfunction.title)}</span><p class="small">${esc(currentMalfunction.description)}</p></div>`;
+      const labels = {integrity:'Molecule integrity', site:'Site of action', absorption:'Absorption potential', local:'Local GI effect', secondary:'Secondary nutrient impact'};
+      const etable = document.getElementById('evidenceTable');
+      etable.innerHTML = '<tr><th>Location</th><th>Molecule integrity</th><th>Site of action</th><th>Absorption potential</th><th>Local GI effect</th><th>Secondary nutrient impact</th></tr>';
+      state.evidenceHistory.forEach(item=>{
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${item.location}</td><td>${item.snapshot.integrity[0]}</td><td>${item.snapshot.site[0]}</td><td>${item.snapshot.absorption[0]}</td><td>${item.snapshot.local[0]}</td><td>${item.snapshot.secondary[0]}</td>`;
+        etable.appendChild(tr);
+      });
 
-  const qualityScore=timeline.reduce((sum,item)=>sum+item.quality,0);
-  const challengeItem=timeline.find(item=>item.challenge) || timeline.reduce((lowest,item)=>!lowest||item.quality<lowest.quality?item:lowest,null);
-  if(!challengeItem)throw new Error("No completed decisions were available for the report.");
-  const codes=timeline.map(item=>item.code).join("-");
-  const fp=`${simId}|${currentMeal.name.slice(0,3).toUpperCase()}|${currentMalfunction.id.toUpperCase()}|${codes}|P${Math.round(state.particle)}-H${Math.round(state.ph)}-N${Math.round(state.breakdown)}-A${Math.round(state.absorption)}`;
+      document.getElementById('sa1').value='';
+      document.getElementById('sa2').value='';
+    }
 
-  document.getElementById("instructorSnapshot").innerHTML=`
-    <div class="score-card"><span class="label">Simulation ID</span><span class="value">${simId}</span></div>
-    <div class="score-card"><span class="label">Decision pattern</span><span class="value">${qualityScore} of 18</span><p class="small">${qualityLabel(qualityScore)}</p></div>`;
-  document.getElementById("fingerprint").textContent=fp;
+    function resizeTextarea(el){
+      el.style.height = 'auto';
+      el.style.height = `${Math.max(130, el.scrollHeight)}px`;
+    }
 
-  const strongestChanges=Object.keys(challengeItem.before).map(metric=>({metric,delta:Math.abs(challengeItem.after[metric]-challengeItem.before[metric])})).sort((a,b)=>b.delta-a.delta).slice(0,2).map(x=>x.metric);
-  if(strongestChanges.length<2)strongestChanges.push(strongestChanges[0]||"breakdown");
-  const metricNames={particle:"Particle Breakdown",ph:"pH Suitability",breakdown:"Nutrient Breakdown",absorption:"Absorption & Transport"};
-  document.getElementById("bottleneck").innerHTML=`
-    <span class="label">Assigned bottleneck checkpoint</span>
-    <h3 style="margin:.25rem 0">${esc(challengeItem.location)}: ${esc(currentMalfunction.title)}</h3>
-    <p><strong>Your action:</strong> ${esc(challengeItem.choice)}</p>
-    <p><strong>Two evidence values:</strong> ${metricNames[strongestChanges[0]]} ${formatDelta(challengeItem,strongestChanges[0])}; ${metricNames[strongestChanges[1]]} ${formatDelta(challengeItem,strongestChanges[1])}.</p>
-    <p><strong>Body feedback:</strong> ${esc(challengeItem.feedback)}</p>
-    <span class="concept-tag">${esc(challengeItem.concept)}</span>`;
+    function saveReportAsPdf(){
+      const first = document.getElementById('sa1');
+      const second = document.getElementById('sa2');
+      if(!first.value.trim() || !second.value.trim()){
+        alert('Please complete both open-ended questions before saving your report as a PDF.');
+        return;
+      }
+      resizeTextarea(first);
+      resizeTextarea(second);
+      window.print();
+    }
 
-  document.getElementById("reportScores").innerHTML=Object.entries({"Particle Breakdown":state.particle,"pH Suitability":state.ph,"Nutrient Breakdown":state.breakdown,"Absorption & Transport":state.absorption}).map(([name,value])=>`<div class="score-card"><span class="label">${name}</span><span class="value">${Math.round(value)} / 100</span><p class="small">${statusFor(name.startsWith("Particle")?"particle":name.startsWith("pH")?"ph":name.startsWith("Nutrient")?"breakdown":"absorption",value)}</p></div>`).join("");
-
-  document.getElementById("reportTimeline").innerHTML=timeline.map((item,index)=>`<div class="timeline-item"><span class="label">Decision ${index+1} · ${esc(item.location)}${item.challenge?" · Assigned challenge":""}</span><strong>${esc(item.choice)}</strong><div class="timeline-stats">Particle ${formatDelta(item,"particle")} · pH ${formatDelta(item,"ph")} · Breakdown ${formatDelta(item,"breakdown")} · Absorption ${formatDelta(item,"absorption")}</div><div class="small">${esc(item.feedback)}</div></div>`).join("");
-}
-
-function updateWordCount(textareaId,countId){
-  const text=document.getElementById(textareaId).value.trim();
-  const count=text?text.split(/\s+/).length:0;
-  const el=document.getElementById(countId);
-  el.textContent=count+" words";
-  el.className="small "+(count>=80&&count<=140?"word-ok":"word-watch");
-}
-
-function restart(){
-  document.getElementById("studentName").value="";
-  document.getElementById("bottleneckResponse").value="";
-  document.getElementById("borderResponse").value="";
-  document.getElementById("simIdHeader").textContent="";
-  generateCase();
-  showScreen("caseScreen");
-}
-
-document.getElementById("startBtn").addEventListener("click",()=>{generateCase();showScreen("caseScreen")});
-document.getElementById("regenerateBtn").addEventListener("click",generateCase);
-document.getElementById("beginBtn").addEventListener("click",startSimulation);
-document.getElementById("nextBtn").addEventListener("click",nextScene);
-document.getElementById("printBtn").addEventListener("click",()=>window.print());
-document.getElementById("restartBtn").addEventListener("click",restart);
-document.getElementById("bottleneckResponse").addEventListener("input",()=>updateWordCount("bottleneckResponse","bottleneckWordCount"));
-document.getElementById("borderResponse").addEventListener("input",()=>updateWordCount("borderResponse","borderWordCount"));
-</script>
+    document.getElementById('startBtn').addEventListener('click', startCase);
+    submitBtn.addEventListener('click', submitCurrent);
+    nextBtn.addEventListener('click', nextStep);
+    document.getElementById('printBtn').addEventListener('click', saveReportAsPdf);
+    document.querySelectorAll('textarea').forEach(el=>{
+      el.addEventListener('input', ()=>resizeTextarea(el));
+    });
+    window.addEventListener('beforeprint', ()=>{
+      document.querySelectorAll('textarea').forEach(resizeTextarea);
+    });
+    document.getElementById('newCaseBtn').addEventListener('click', ()=>{
+      reportScreen.classList.add('hidden');
+      startScreen.classList.remove('hidden');
+      window.scrollTo({top:0,behavior:'smooth'});
+    });
+  </script>
 </body>
 </html>
