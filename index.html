@@ -206,7 +206,7 @@
             <ol>
               <li>Enter your name and select <strong>Start Random Case</strong>.</li>
               <li>Read the claim and identify what must happen for the substance to work.</li>
-              <li>Complete all five checkpoints. Use the Evidence Panel to follow molecule integrity, site of action, absorption potential, local GI effects, and possible nutrient impacts.</li>
+              <li>Complete all five checkpoints. Checkpoints 1–4 are worth <strong>2 points each</strong>. Checkpoint 5 is worth <strong>4 points total</strong>: 2 points for the verdict and 2 points for selecting the strongest evidence. Use the Evidence Panel to follow molecule integrity, site of action, absorption potential, local GI effects, and possible nutrient impacts.</li>
               <li>After the verdict, review your case report and answer the two open-ended questions in your own words.</li>
               <li>Save the finished report as a PDF on your desktop and upload the PDF to the Canvas assignment.</li>
             </ol>
@@ -328,11 +328,10 @@
             <h3>Instructor Rubric (20 points)</h3>
             <table>
               <tr><th>Criterion</th><th>Points</th></tr>
-              <tr><td>Substance and success requirement: correctly identifies what the substance or issue is and what must happen for it to work.</td><td>4</td></tr>
-              <tr><td>GI-tract analysis: accurately interprets what happens at the stomach and small-intestine checkpoints.</td><td>5</td></tr>
-              <tr><td>Absorption and site of action: distinguishes acting within the GI tract from entering blood and reaching a target tissue.</td><td>4</td></tr>
-              <tr><td>Importance and impact: explains why the process matters and gives a logical case-specific impact of misunderstanding it.</td><td>4</td></tr>
-              <tr><td>Process reflection and own reasoning: identifies a specific difficult or unclear part of the process and explains it in the student’s own thoughts and words.</td><td>3</td></tr>
+              <tr><td>Checkpoints 1–4: correctly analyzes the substance, success requirement, stomach checkpoint, and small-intestine/absorption checkpoint.</td><td>8</td></tr>
+              <tr><td>Checkpoint 5: selects the correct evidence-based verdict and the two strongest supporting evidence statements.</td><td>4</td></tr>
+              <tr><td>Open-ended Question 1: explains why the process is important and gives a logical, case-specific impact of not understanding it.</td><td>4</td></tr>
+              <tr><td>Open-ended Question 2: identifies a specific difficult or unclear part of the process and explains it in the student’s own thoughts and words.</td><td>4</td></tr>
               <tr><th>Total</th><th>20</th></tr>
             </table>
           </div>
@@ -897,7 +896,7 @@
         if(!selected){ alert('Please select an answer before submitting.'); return; }
         const choice = Number(selected.value);
         const isCorrect = choice===step.correct;
-        state.responses.push({step:step.title, type:'mcq', prompt:step.prompt, studentAnswer:step.options[choice], correctAnswer:step.options[step.correct], correct:isCorrect, points:isCorrect?1:0, maxPoints:1});
+        state.responses.push({step:step.title, type:'mcq', prompt:step.prompt, studentAnswer:step.options[choice], correctAnswer:step.options[step.correct], correct:isCorrect, points:isCorrect?2:0, maxPoints:2});
         if(step.evidenceAfter){
           state.currentEvidence = clone(step.evidenceAfter);
           const location = step.key==='stomach' ? 'After stomach checkpoint' : step.key==='intestine' ? 'After small-intestine checkpoint' : `After ${step.title}`;
@@ -914,10 +913,10 @@
         const verdictChoice = Number(verdict.value);
         const verdictCorrect = verdictChoice===step.correctVerdict;
         const exactEvidence = step.correctEvidence.every(v=>checks.includes(v)) && checks.every(v=>step.correctEvidence.includes(v));
-        const points = (verdictCorrect?1:0) + (exactEvidence?1:0);
+        const points = (verdictCorrect?2:0) + (exactEvidence?2:0);
         state.responses.push({step:step.title, type:'final', prompt:step.prompt, studentAnswer:`Verdict: ${step.verdictOptions[verdictChoice]} | Evidence: ${checks.map(i=>step.evidenceOptions[i]).join(' || ')}`,
           correctAnswer:`Verdict: ${step.verdictOptions[step.correctVerdict]} | Evidence: ${step.correctEvidence.map(i=>step.evidenceOptions[i]).join(' || ')}`,
-          correct: verdictCorrect && exactEvidence, points, maxPoints:2});
+          correct: verdictCorrect && exactEvidence, points, maxPoints:4});
         feedback.className = `feedback ${(verdictCorrect && exactEvidence)?'correct':'incorrect'}`;
         feedback.innerHTML = `<strong>${(verdictCorrect && exactEvidence)?'Strong case verdict.':'Review the evidence.'}</strong> ${step.feedback}<br><br><strong>Best verdict:</strong> ${step.verdictOptions[step.correctVerdict]}<br><strong>Best evidence:</strong><ul><li>${step.correctEvidence.map(i=>step.evidenceOptions[i]).join('</li><li>')}</li></ul>`;
         state.evidenceHistory.push({location:'Final verdict prepared', snapshot:clone(state.currentEvidence)});
@@ -955,7 +954,7 @@
       document.getElementById('reflectionCase').textContent = state.caseObj.title;
       document.getElementById('reflectionSimId').textContent = state.simId;
       document.getElementById('scoreBig').textContent = `${totalPoints} / ${maxPoints}`;
-      document.getElementById('scoreText').textContent = 'This score reflects the decision checkpoints only. The short-answer responses should be graded with the rubric.';
+      document.getElementById('scoreText').textContent = 'This score reflects the 12-point decision section: 2 points each for Checkpoints 1–4 and 4 points for Checkpoint 5. The two open-ended responses are graded separately with the rubric.';
 
       const dtable = document.getElementById('decisionTable');
       dtable.innerHTML = '<tr><th>Checkpoint</th><th>Your answer</th><th>Best answer</th><th>Score</th></tr>';
