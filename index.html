@@ -162,6 +162,14 @@
       .card{box-shadow:none}
       .wrap{max-width:none;padding:0}
       textarea{border:1px solid #999;min-height:150px}
+      body.printing #reportScreen.hidden,
+      body.printing #reflectionScreen.hidden{display:block !important}
+      body.printing #startScreen,
+      body.printing #simScreen{display:none !important}
+      body.printing #reflectionScreen{
+        break-before:page;
+        page-break-before:always;
+      }
     }
   </style>
 </head>
@@ -302,24 +310,11 @@
             <h3>Evidence Trail</h3>
             <table id="evidenceTable"></table>
           </div>
-          <div class="card">
-            <h3>Open-Ended Responses</h3>
-            <p><strong>1. Why is this digestive and absorption process important to understand?</strong> Use your assigned case to explain at least one potential impact of not understanding what happens to the substance as it moves through the GI tract.</p>
-            <textarea id="sa1" aria-label="Response to question 1"></textarea>
-            <p><strong>2. What part of the process is still least clear or was hardest for you to understand?</strong> Identify a specific digestive step, absorption step, substance change, or GI location from your case and explain what makes that part difficult.</p>
-            <textarea id="sa2" aria-label="Response to question 2"></textarea>
-            <div class="note no-print" style="margin-top:16px;">
-              <strong>Submit your report to Canvas</strong>
-              <ol style="margin-bottom:0;">
-                <li>Finish both open-ended responses.</li>
-                <li>Select <strong>Save Report as PDF</strong> below.</li>
-                <li>In the print window, choose <strong>Save as PDF</strong>.</li>
-                <li>Save the file on your desktop using a clear filename such as <strong>Lastname_Firstname_GI_Evidence_Lab.pdf</strong>.</li>
-                <li>Upload that PDF to the Canvas assignment.</li>
-              </ol>
-            </div>
-            <div class="btnrow no-print">
-              <button class="secondary" id="printBtn">Save Report as PDF</button>
+          <div class="card no-print">
+            <h3>Next: Complete Your Reflection</h3>
+            <p>Your case results are ready. Continue to a separate page to answer the two open-ended questions and review the PDF submission directions.</p>
+            <div class="btnrow">
+              <button class="primary" id="openReflectionBtn">Continue to Open-Ended Questions</button>
             </div>
           </div>
         </div>
@@ -341,13 +336,72 @@
               <tr><th>Total</th><th>20</th></tr>
             </table>
           </div>
+
+        </div>
+      </div>
+      <div class="footer-space"></div>
+    </section>
+
+    <section id="reflectionScreen" class="hidden">
+      <div class="card">
+        <div class="btnrow no-print" style="justify-content:space-between;align-items:center;">
+          <div>
+            <h2 style="margin-bottom:6px;">Open-Ended Reflection and Submission</h2>
+            <div class="small"><strong id="reflectionCase"></strong><br>Simulation ID: <span id="reflectionSimId"></span></div>
+          </div>
+          <button class="ghost" id="backToReportBtn">Back to Case Report</button>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div>
           <div class="card">
-            <h3>Notes for Students</h3>
+            <h3>Complete Both Questions</h3>
+            <p><strong>1. Why is this digestive and absorption process important to understand?</strong> Use your assigned case to explain at least one potential impact of not understanding what happens to the substance as it moves through the GI tract.</p>
+            <textarea id="sa1" aria-label="Response to question 1"></textarea>
+
+            <p><strong>2. What part of the process is still least clear or was hardest for you to understand?</strong> Identify a specific digestive step, absorption step, substance change, or GI location from your case and explain what makes that part difficult.</p>
+            <textarea id="sa2" aria-label="Response to question 2"></textarea>
+          </div>
+
+          <div class="card">
+            <h3>Save and Submit Your Report</h3>
+            <ol>
+              <li>Finish both open-ended responses.</li>
+              <li>Select <strong>Save Report as PDF</strong> below.</li>
+              <li>In the print window, choose <strong>Save as PDF</strong>.</li>
+              <li>Save the file on your desktop using a clear filename such as <strong>Lastname_Firstname_GI_Evidence_Lab.pdf</strong>.</li>
+              <li>Open the Canvas assignment and upload the PDF from your desktop.</li>
+              <li>Confirm that the correct file is attached before submitting the assignment.</li>
+            </ol>
+            <div class="note">
+              The saved PDF will include your case report, decision review, evidence trail, rubric, and both open-ended responses.
+            </div>
+            <div class="btnrow no-print">
+              <button class="secondary" id="printBtn">Save Report as PDF</button>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="card">
+            <h3>Response Expectations</h3>
             <ul>
               <li>Connect Question 1 to the hormone, enzyme, medication, or absorption issue in your assigned case.</li>
-              <li>For Question 2, name the exact step or location that remains difficult or unclear.</li>
-              <li>Do not write that “nothing was difficult” without discussing a specific part of the process.</li>
+              <li>For Question 2, name the exact step or GI location that remains difficult or unclear.</li>
+              <li>You may describe something that became clearer during the activity, but you must still discuss a specific part of the process.</li>
               <li>Write in your own words. A strong answer sounds like <em>your</em> explanation of <em>your</em> randomized case.</li>
+            </ul>
+          </div>
+
+          <div class="card scorebox">
+            <div class="kicker">Before saving</div>
+            <h3 style="margin-top:6px;">Final Check</h3>
+            <p>Make sure both responses:</p>
+            <ul>
+              <li>Refer to your assigned case.</li>
+              <li>Discuss an actual digestive or absorption process.</li>
+              <li>Explain your reasoning rather than only stating an opinion.</li>
             </ul>
           </div>
         </div>
@@ -368,42 +422,42 @@
         initialEvidence:{integrity:['Intact insulin protein','neutral'], site:['Swallowed substance in GI tract','neutral'], absorption:['Not yet relevant','neutral'], local:['No therapeutic effect yet','neutral'], secondary:['No clear nutrient effect identified','neutral']},
         steps:[
           { type:'mcq', key:'classify', title:'Checkpoint 1: Identify the substance', prompt:'What best describes regular insulin in this case?', options:[
-              'A peptide hormone (a protein) that must keep its shape to work',
-              'A simple sugar that is quickly absorbed',
-              'A mineral antacid that neutralizes stomach acid',
-              'A fiber that remains in the large intestine'
+              'A peptide hormone made of amino acids that must retain its functional shape',
+              'A monosaccharide medication that must be absorbed unchanged into circulation',
+              'A mineral-based medication that must neutralize acid before absorption',
+              'A nondigestible carbohydrate that must remain intact through the intestine'
             ], correct:0,
             feedback:'Insulin is a peptide hormone. Its shape matters because it must bind to receptors on body cells to work.' },
           { type:'mcq', key:'success', title:'Checkpoint 2: Define success', prompt:'What must happen for swallowed insulin to work like injected insulin?', options:[
-              'It must be broken into amino acids before absorption',
-              'It must reach the bloodstream intact and still be functional',
-              'It must stay in the stomach and neutralize acid',
-              'It must remain inside the intestinal lumen to digest lactose'
+              'It must be split into absorbable amino acids before reaching circulation',
+              'It must reach the bloodstream intact and retain its functional shape',
+              'It must remain in the stomach long enough to neutralize gastric acid',
+              'It must act within the intestinal lumen before being broken down'
             ], correct:1,
             feedback:'Injected insulin bypasses digestion. To have the same effect, it would need to reach the bloodstream intact and functional.' },
           { type:'mcq', key:'stomach', title:'Checkpoint 3: Stomach checkpoint', prompt:'What is the most important problem for a regular insulin pill in the stomach?', options:[
-              'Stomach acid and pepsin begin denaturing and digesting the insulin protein',
-              'Insulin is converted into glucose for rapid energy',
-              'The stomach pumps insulin directly into the bloodstream',
-              'Bile emulsifies the insulin so it can dissolve in fat'
+              'Gastric acid alters its shape while pepsin begins breaking peptide bonds',
+              'Gastric acid converts it into glucose that can enter the bloodstream',
+              'Stomach contractions move the intact hormone through the stomach wall',
+              'Bile released into the stomach emulsifies it for lymphatic absorption'
             ], correct:0,
             feedback:'The stomach is harsh for proteins. Acid alters insulin’s structure and pepsin begins breaking peptide bonds.',
             evidenceAfter:{integrity:['Denatured and beginning to fragment','bad'], site:['Stomach lumen','neutral'], absorption:['Not ready for absorption as insulin','bad'], local:['Protein digestion has begun','neutral'], secondary:['No helpful nutrient effect; insulin function is being lost','bad']}
           },
           { type:'mcq', key:'intestine', title:'Checkpoint 4: Small intestine and absorption checkpoint', prompt:'Even if some insulin survived the stomach, what is the best explanation of what would happen next?', options:[
-              'Pancreatic proteases and peptidases would continue digesting it, and intact insulin would not readily cross into blood',
-              'The small intestine would absorb intact insulin exactly like glucose',
-              'Bicarbonate would rebuild the insulin molecule so it could work again',
-              'Insulin would move to the large intestine and become more active'
+              'Pancreatic proteases would continue breaking peptide bonds, while the intact hormone would cross poorly into blood',
+              'Pancreatic amylase would convert the intact hormone into glucose that would enter blood through the villi',
+              'Bicarbonate would restore the hormone’s original shape before it crossed through the intestinal lining',
+              'Intestinal bacteria would activate the intact hormone before it moved through the colon into circulation'
             ], correct:0,
             feedback:'The small intestine continues protein digestion. Amino acids can be absorbed, but the original insulin molecule is no longer present as an intact hormone.',
             evidenceAfter:{integrity:['Fragmented into peptides / amino acids','bad'], site:['Small-intestinal lumen','neutral'], absorption:['Only amino acids can absorb; intact insulin is not available','bad'], local:['Protein digestion continues; hormone function is lost','bad'], secondary:['Absorbed amino acids do not act like insulin','bad']}
           },
           { type:'final', key:'verdict', title:'Checkpoint 5: Evidence-based verdict', prompt:'What is the best verdict on the original claim?', verdictOptions:['Supported','Partially supported','Not supported'], correctVerdict:2, evidenceOptions:[
-              'In the stomach, acid and pepsin begin denaturing and digesting insulin.',
-              'Insulin works best after it is fully broken into amino acids.',
-              'In the small intestine, proteases continue digestion and intact insulin does not readily reach the bloodstream.',
-              'Bile turns insulin into a usable hormone in the small intestine.'
+              'In the stomach, acid alters insulin’s shape while pepsin begins breaking its peptide bonds.',
+              'In the stomach, insulin is protected from protein digestion and remains unchanged in gastric fluid.',
+              'In the small intestine, proteases continue digestion and little intact insulin is available to enter blood.',
+              'In the small intestine, bile rebuilds insulin so it can bind correctly to receptors on body cells.'
             ], correctEvidence:[0,2],
             feedback:'A regular insulin pill is not supported by the digestive evidence. The molecule is digested and does not reach the bloodstream intact like injected insulin.' }
         ]
@@ -418,42 +472,42 @@
         initialEvidence:{integrity:['Intact protein hormone from food source','neutral'], site:['Swallowed as part of food','neutral'], absorption:['Not yet relevant','neutral'], local:['No digestive processing yet','neutral'], secondary:['No clear nutrient effect identified','neutral']},
         steps:[
           { type:'mcq', key:'classify', title:'Checkpoint 1: Identify the substance', prompt:'What best describes this growth hormone claim?', options:[
-              'A protein or peptide hormone that would need to stay intact to act hormonally',
-              'A starch that must be digested into glucose',
-              'A mineral that neutralizes acid',
-              'An insoluble fiber that is never altered in the GI tract'
+              'A peptide hormone from food that would need to remain intact to act on human receptors',
+              'A complex carbohydrate from food that would need to become glucose before acting on receptors',
+              'A mineral compound from food that would need to neutralize gastric acid before absorption',
+              'A nondigestible fiber from food that would need to remain intact in the colon'
             ], correct:0,
             feedback:'Growth hormone is a protein/peptide hormone. A hormone has to remain intact enough to interact with receptors.' },
           { type:'mcq', key:'success', title:'Checkpoint 2: Define success', prompt:'For the claim to be true, what would have to happen?', options:[
-              'The hormone would need to survive digestion, reach circulation, and still have biologic activity',
-              'The hormone would need to become amino acids first in order to act as a hormone',
-              'The hormone would only need to stay in the stomach',
-              'The hormone would need to bind bile acids in the large intestine'
+              'The hormone would need to survive digestion, enter circulation intact, and retain activity at human receptors',
+              'The hormone would need to become amino acids that reassemble into an active hormone after absorption',
+              'The hormone would need to remain in the stomach and stimulate acid secretion before digestion',
+              'The hormone would need to bind bile acids and travel with them through lymph to target tissues'
             ], correct:0,
             feedback:'For a food-borne hormone to affect the body hormonally, it would need to survive digestion and remain biologically active after absorption.' },
           { type:'mcq', key:'stomach', title:'Checkpoint 3: Stomach checkpoint', prompt:'What is the best prediction for a protein hormone in the stomach?', options:[
-              'Acid and pepsin begin denaturing and breaking it down',
-              'It becomes more hormonally active after mixing with HCl',
-              'It moves directly through the stomach wall intact',
-              'It is emulsified by bile in the stomach'
+              'Acid and pepsin alter its structure and begin breaking peptide bonds',
+              'Acid and pepsin preserve its structure and increase receptor-binding activity',
+              'Stomach contractions move the intact hormone directly through gastric cells',
+              'Bile released into the stomach emulsifies the hormone for absorption'
             ], correct:0,
             feedback:'The stomach treats dietary proteins as proteins, not as preserved hormones.',
             evidenceAfter:{integrity:['Denatured / early fragmentation','bad'], site:['Stomach lumen','neutral'], absorption:['Not ready for absorption as a hormone','bad'], local:['Protein digestion begins','neutral'], secondary:['Behaving like dietary protein, not active hormone','neutral']}
           },
           { type:'mcq', key:'intestine', title:'Checkpoint 4: Small intestine and absorption checkpoint', prompt:'What is the best conclusion at the small-intestinal border?', options:[
-              'Further protein digestion continues; fragments or amino acids may be absorbed, but the original hormone is not acting as a hormone',
-              'The hormone is routinely absorbed intact and becomes strongly active in humans',
-              'Bicarbonate converts amino acids back into a working hormone',
-              'The hormone becomes fiber and stays in the colon'
+              'Proteases continue digestion, so absorbed amino acids no longer function as the original hormone at human receptors',
+              'Brush-border enzymes rebuild absorbed amino acids into the original hormone before they enter circulation',
+              'Bicarbonate protects the intact hormone and carries it through the intestinal wall into systemic blood',
+              'Intestinal bacteria activate the intact hormone and send it through the colon to distant tissues'
             ], correct:0,
             feedback:'Even if amino acids are absorbed, that is not the same as absorbing an intact, working hormone.',
             evidenceAfter:{integrity:['Broken into smaller fragments / amino acids','bad'], site:['Small-intestinal lumen and border','neutral'], absorption:['Possible as amino acids, not as intact active hormone','bad'], local:['Normal protein digestion and absorption rules apply','neutral'], secondary:['Main outcome is nutrient absorption, not hormone signaling','neutral']}
           },
           { type:'final', key:'verdict', title:'Checkpoint 5: Evidence-based verdict', prompt:'What is the best verdict on the original claim?', verdictOptions:['Supported','Partially supported','Not supported'], correctVerdict:2, evidenceOptions:[
-              'In the stomach, the hormone is exposed to acid and pepsin like other proteins.',
-              'Hormones become more biologically active after full digestion into amino acids.',
-              'At the intestinal border, amino acids may be absorbed, but that is not the same as absorbing an intact active hormone.',
-              'Bile stores the hormone so it can reach human tissues unchanged.'
+              'In the stomach, acid and pepsin alter the hormone’s structure and begin breaking peptide bonds.',
+              'In the stomach, acid preserves the hormone’s structure and increases its activity at human receptors.',
+              'At the intestinal border, amino acids may absorb, but they no longer function as the intact food hormone.',
+              'At the intestinal border, bile carries the intact hormone through the villi and into human circulation.'
             ], correctEvidence:[0,2],
             feedback:'The claim is not supported. Digestion breaks the hormone down, and the digestive tract is not a simple delivery route for active food hormones.' }
         ]
@@ -468,42 +522,42 @@
         initialEvidence:{integrity:['Lactase enzyme in tablet form','neutral'], site:['Swallowed with or just before dairy food','neutral'], absorption:['Not yet relevant','neutral'], local:['Goal is local digestion of lactose','good'], secondary:['If lactose is split, carbohydrate absorption improves','good']},
         steps:[
           { type:'mcq', key:'classify', title:'Checkpoint 1: Identify the substance', prompt:'What best describes lactase in this case?', options:[
-              'A digestive enzyme protein meant to act on lactose in the GI tract',
-              'A hormone that must travel through blood to muscle cells',
-              'A mineral used to neutralize HCl',
-              'A fat-soluble vitamin that must enter lymph first'
+              'A digestive enzyme made of protein that acts on lactose within the intestinal lumen',
+              'A peptide hormone made of protein that acts on receptors after entering the bloodstream',
+              'A mineral compound that raises stomach pH before being absorbed into the bloodstream',
+              'A fat-soluble vitamin that enters lymph before reaching cells throughout the body'
             ], correct:0,
             feedback:'Lactase is an enzyme. The key difference is that it can help by acting locally in the digestive tract.' },
           { type:'mcq', key:'success', title:'Checkpoint 2: Define success', prompt:'What must happen for a lactase tablet to be helpful?', options:[
-              'It must enter the bloodstream intact and act on distant cells',
-              'It must break lactose into absorbable sugars before lactose reaches the brush border',
-              'It must stop stomach acid production completely',
-              'It must stay inactive until the large intestine'
+              'It must enter the blood intact and bind receptors on distant body cells',
+              'It must contact lactose and split it into absorbable sugars in the small intestine',
+              'It must suppress acid production long enough to protect the stomach lining',
+              'It must remain inactive until bacteria ferment lactose in the large intestine'
             ], correct:1,
             feedback:'Lactase only needs to work long enough in the upper GI tract to split lactose into glucose and galactose.' },
           { type:'mcq', key:'stomach', title:'Checkpoint 3: Stomach checkpoint', prompt:'Which statement best describes the stomach checkpoint?', options:[
-              'Some enzyme activity may be lost in the stomach, but the goal is still local digestion rather than bloodstream delivery',
-              'The stomach absorbs lactase directly into the blood',
-              'Pepsin turns lactase into a hormone that controls blood sugar',
-              'Lactase neutralizes acid like an antacid'
+              'Some activity may be lost in the stomach, but remaining enzyme can still act locally downstream',
+              'Most lactase is absorbed intact in the stomach and then returned to the intestine through blood',
+              'Pepsin converts lactase into a hormone that signals the pancreas to release insulin',
+              'Lactase neutralizes stomach acid before moving unchanged into the small intestine'
             ], correct:0,
             feedback:'Not all swallowed lactase necessarily survives unchanged, but it does not need to enter the bloodstream to help.',
             evidenceAfter:{integrity:['Some activity may be reduced; enough may remain to act locally','neutral'], site:['Moving from stomach toward small intestine','neutral'], absorption:['Not intended for bloodstream absorption','good'], local:['Potential for local enzyme action remains','good'], secondary:['If lactose is digested, carbohydrate symptoms decrease','good']}
           },
           { type:'mcq', key:'intestine', title:'Checkpoint 4: Small intestine and absorption checkpoint', prompt:'What is the most important event in the small intestine?', options:[
-              'Lactase acts on lactose in the intestinal lumen, producing glucose and galactose that can be absorbed',
-              'Intact lactose is absorbed directly without digestion',
-              'Bile converts lactose into amino acids',
-              'Lactase must cross into the blood to digest lactose there'
+              'Lactase contacts lactose in the lumen and splits it into glucose and galactose for absorption',
+              'Intact lactose crosses the intestinal border before being split into glucose and galactose in blood',
+              'Bile emulsifies lactose in the lumen and converts it into amino acids for absorption',
+              'Lactase crosses the intestinal border and digests lactose after both enter the bloodstream'
             ], correct:0,
             feedback:'This is the key difference from insulin: the enzyme works in the GI tract, and the products of digestion—not the enzyme itself—are what get absorbed.',
             evidenceAfter:{integrity:['Lactase may act locally; lactose is split into monosaccharides','good'], site:['Small-intestinal lumen / brush border','good'], absorption:['Glucose and galactose are absorbable; lactase itself does not need to be absorbed','good'], local:['Local lactose digestion occurs','good'], secondary:['Improved carbohydrate digestion reduces lactose-related GI symptoms','good']}
           },
           { type:'final', key:'verdict', title:'Checkpoint 5: Evidence-based verdict', prompt:'What is the best verdict on the original claim?', verdictOptions:['Supported','Partially supported','Not supported'], correctVerdict:0, evidenceOptions:[
-              'Lactase only has to act locally in the digestive tract; it does not need to reach body cells through the blood.',
-              'Lactose can be absorbed intact, so digestion is unnecessary.',
-              'In the small intestine, lactase can split lactose into glucose and galactose, which are absorbable.',
-              'Bile is the main enzyme that digests lactose.'
+              'Lactase can act locally in the intestinal lumen without first traveling through the blood to distant cells.',
+              'Lactose can cross the intestinal lining intact and can be separated into sugars after it enters blood.',
+              'In the small intestine, lactase can split lactose into glucose and galactose that are ready for absorption.',
+              'In the small intestine, bile is the main enzyme that splits lactose into its absorbable sugar units.'
             ], correctEvidence:[0,2],
             feedback:'The claim is supported. A lactase tablet can help because it acts locally in the GI tract rather than needing to survive digestion and travel through the bloodstream.' }
         ]
@@ -518,42 +572,42 @@
         initialEvidence:{integrity:['Antacid compound ready to neutralize acid','good'], site:['Swallowed medication entering the stomach','neutral'], absorption:['Main benefit is local, not dependent on bloodstream delivery','good'], local:['Goal is to neutralize existing acid','good'], secondary:['Possible nutrient effects depend on repeated or long-term use','neutral']},
         steps:[
           { type:'mcq', key:'classify', title:'Checkpoint 1: Identify the substance', prompt:'What best describes an antacid in this case?', options:[
-              'A local acid-neutralizing compound',
-              'A protein hormone that must stay intact',
-              'A digestive enzyme that breaks lactose',
-              'A fiber supplement that increases stool bulk'
+              'A mineral-based compound that neutralizes acid already present in the stomach',
+              'A peptide hormone that reduces acid after entering circulation and binding receptors',
+              'A digestive enzyme that breaks protein after entering the small-intestinal lumen',
+              'A soluble fiber that binds gastric acid and carries it into the large intestine'
             ], correct:0,
             feedback:'An antacid mainly works locally by neutralizing acid already present in the stomach.' },
           { type:'mcq', key:'success', title:'Checkpoint 2: Define success', prompt:'What must happen for an antacid to relieve typical GERD symptoms?', options:[
-              'It must be digested into amino acids first',
-              'It must lower the acidity of stomach contents so refluxed material is less irritating',
-              'It must rebuild the lower esophageal sphincter',
-              'It must increase bile release'
+              'It must be digested into amino acids that then reduce acid secretion',
+              'It must raise the pH of stomach contents so refluxed material is less irritating',
+              'It must repair the lower esophageal sphincter so contents cannot move upward',
+              'It must increase bile flow so acid is carried directly into the small intestine'
             ], correct:1,
             feedback:'An antacid does not repair the sphincter. It helps by making stomach contents less acidic, which may reduce irritation.' },
           { type:'mcq', key:'stomach', title:'Checkpoint 3: Stomach checkpoint', prompt:'What is the best stomach-level effect of an antacid?', options:[
-              'It neutralizes some hydrochloric acid and raises stomach pH',
-              'It stimulates pepsin to digest protein faster',
-              'It turns lactose into glucose',
-              'It causes the stomach to secrete more acid immediately'
+              'It reacts with hydrochloric acid and raises the pH of stomach contents',
+              'It activates pepsin and lowers the pH of stomach contents more quickly',
+              'It converts lactose into glucose and galactose within the stomach',
+              'It blocks bile release and keeps stomach contents from entering the intestine'
             ], correct:0,
             feedback:'Antacids act quickly on acid that is already present.',
             evidenceAfter:{integrity:['Antacid has reacted with acid','good'], site:['Stomach lumen','neutral'], absorption:['Symptom relief does not require significant systemic absorption','good'], local:['Acidity is reduced; pH rises','good'], secondary:['Higher pH may reduce pepsin activity','neutral']}
           },
           { type:'mcq', key:'intestine', title:'Checkpoint 4: Small intestine and absorption checkpoint', prompt:'Which statement best captures the tradeoff of frequent or long-term acid neutralization?', options:[
-              'Lower acidity may reduce stomach irritation, but can also reduce protein denaturation and may interfere with absorption of some nutrients such as iron or food-bound vitamin B12',
-              'Neutralizing acid has no possible effect on digestion or nutrients',
-              'An antacid works mainly by improving villi height in the small intestine',
-              'Antacids permanently cure reflux by tightening the lower esophageal sphincter'
+              'Less gastric acid may ease irritation, but repeated suppression can reduce protein denaturation and absorption of iron or food-bound vitamin B12',
+              'Less gastric acid may ease irritation, while repeated suppression strengthens protein digestion and increases absorption of iron and B12',
+              'Less gastric acid may ease irritation because antacids repair villi and permanently improve absorption throughout the small intestine',
+              'Less gastric acid may ease irritation because antacids tighten the lower esophageal sphincter and permanently prevent reflux'
             ], correct:0,
             feedback:'Antacids can help symptoms, but symptom relief is not the same as fixing the cause. Reducing acidity may also change how some digestive processes work.',
             evidenceAfter:{integrity:['Medication goal achieved locally; no special intact molecule needed','good'], site:['Stomach to upper small intestine','neutral'], absorption:['Primary effect is local, but some nutrient absorption may be altered indirectly','neutral'], local:['Acid is reduced; pepsin activity may be lower','neutral'], secondary:['Possible lower absorption of certain nutrients with frequent long-term use','neutral']}
           },
           { type:'final', key:'verdict', title:'Checkpoint 5: Evidence-based verdict', prompt:'What is the best verdict on the original claim?', verdictOptions:['Supported','Partially supported','Not supported'], correctVerdict:1, evidenceOptions:[
-              'In the stomach, an antacid can neutralize acid and reduce the acidity of refluxed contents.',
-              'Antacids permanently correct the lower esophageal sphincter problem.',
-              'Over time, changing stomach acidity can influence digestion and absorption of some nutrients.',
-              'Antacids only work after they are converted into hormones in the bloodstream.'
+              'In the stomach, an antacid can neutralize existing acid and make refluxed contents less irritating.',
+              'In the stomach, an antacid permanently repairs the lower esophageal sphincter and stops reflux.',
+              'Over time, repeated changes in stomach acidity can influence protein digestion and absorption of some nutrients.',
+              'Over time, antacids are converted into hormones that enter blood and suppress acid production.'
             ], correctEvidence:[0,2],
             feedback:'The claim is only partially supported. Antacids can relieve acid-related symptoms, but they do not completely fix GERD, and repeated acid reduction may affect digestion or some nutrient absorption.' }
         ]
@@ -568,42 +622,42 @@
         initialEvidence:{integrity:['Enzyme capsule intended for intestinal release','good'], site:['Swallowed with food','neutral'], absorption:['Not intended for bloodstream absorption','good'], local:['Goal is local digestion of food molecules','good'], secondary:['If enzyme release is inadequate, fats and fat-soluble vitamins may be affected','neutral']},
         steps:[
           { type:'mcq', key:'classify', title:'Checkpoint 1: Identify the substance', prompt:'What best describes this pancreatic enzyme capsule?', options:[
-              'A local digestive-enzyme treatment meant to work in the small intestine',
-              'A hormone that must bind receptors on body cells',
-              'A fiber supplement for the colon only',
-              'A mineral that only neutralizes stomach acid'
+              'A digestive-enzyme treatment designed to act on food within the small-intestinal lumen',
+              'A peptide hormone treatment designed to enter blood and bind receptors on body cells',
+              'A soluble-fiber treatment designed to hold water and increase stool bulk in the colon',
+              'A mineral-antacid treatment designed to neutralize acid already present in the stomach'
             ], correct:0,
             feedback:'These are digestive enzymes. Their job is to help digest food in the intestinal lumen.' },
           { type:'mcq', key:'success', title:'Checkpoint 2: Define success', prompt:'What must happen for the capsule to help digestion?', options:[
-              'The enzymes must reach the bloodstream intact',
-              'The enzymes must be protected long enough to reach the small intestine and act on food there',
-              'The enzymes must completely shut down stomach acid production',
-              'The enzymes must move directly to the large intestine'
+              'The enzymes must reach the bloodstream intact and act on nutrients in distant tissues',
+              'The enzymes must survive long enough to reach the small intestine and act on food there',
+              'The enzymes must completely suppress stomach acid before any nutrients are digested',
+              'The enzymes must remain inactive until they reach the large intestine and meet bacteria'
             ], correct:1,
             feedback:'The point is local intestinal action. Bloodstream delivery is not the goal.' },
           { type:'mcq', key:'stomach', title:'Checkpoint 3: Stomach checkpoint', prompt:'Why is the stomach checkpoint important for this case?', options:[
-              'Stomach acid can damage enzymes, so the preparation needs protection or timing that helps the enzymes reach the small intestine',
-              'The stomach is where the enzymes must be absorbed into blood',
-              'The stomach converts the enzymes into bile acids',
-              'The stomach stores the enzymes until they are needed in muscle tissue'
+              'Stomach acid can damage enzymes, so the formulation must protect them until intestinal release',
+              'Stomach acid activates enzymes, so the formulation must release them immediately in the stomach',
+              'The stomach wall absorbs enzymes intact, so the formulation must dissolve before gastric emptying',
+              'Stomach contractions convert enzymes into bile acids before their intestinal release'
             ], correct:0,
             feedback:'A protective coating or proper formulation helps digestive enzymes avoid being destroyed too early.',
             evidenceAfter:{integrity:['Protected / intended to survive stomach passage long enough to help later','good'], site:['Passing through stomach toward small intestine','neutral'], absorption:['Still not intended for bloodstream absorption','good'], local:['No major benefit yet; action site is later','neutral'], secondary:['Preserving enzyme activity helps digestion downstream','good']}
           },
           { type:'mcq', key:'intestine', title:'Checkpoint 4: Small intestine and absorption checkpoint', prompt:'What is the most important small-intestine event?', options:[
-              'The enzymes are released and help digest carbohydrates, proteins, and fats in the lumen; the digested nutrients then become absorbable',
-              'The enzymes themselves must be absorbed into blood to digest the meal',
-              'Bicarbonate turns all nutrients into fiber',
-              'The enzymes cause the villi to disappear'
+              'The enzymes are released into the lumen and digest carbohydrates, proteins, and fats into absorbable products',
+              'The enzymes cross into the bloodstream and digest carbohydrates, proteins, and fats inside body tissues',
+              'The enzymes neutralize bicarbonate and convert all meal components into nondigestible fiber',
+              'The enzymes damage villi so partially digested nutrients can pass directly into circulation'
             ], correct:0,
             feedback:'The enzymes help create absorbable products; the enzymes themselves do not need to become circulating hormones.',
             evidenceAfter:{integrity:['Enzymes active locally on food molecules','good'], site:['Small-intestinal lumen','good'], absorption:['Digested nutrients become absorbable; enzymes themselves do not need absorption','good'], local:['Digestive capacity improves locally','good'], secondary:['Improved fat digestion may support fat-soluble vitamin absorption','good']}
           },
           { type:'final', key:'verdict', title:'Checkpoint 5: Evidence-based verdict', prompt:'What is the best verdict on the original claim?', verdictOptions:['Supported','Partially supported','Not supported'], correctVerdict:0, evidenceOptions:[
-              'The enzymes are meant to work in the small-intestinal lumen, not as hormones in the blood.',
-              'The enzymes must be absorbed into muscle tissue to help digestion.',
-              'By helping digest nutrients into absorbable forms, the capsule can improve nutrient absorption even without enzyme absorption.',
-              'The large intestine is the main site where pancreatic enzymes digest food.'
+              'The enzymes are designed to work in the small-intestinal lumen rather than act as hormones in the blood.',
+              'The enzymes must enter muscle tissue before they can digest the nutrients moving through the intestine.',
+              'By producing absorbable nutrient forms in the lumen, the capsule can improve absorption without the enzymes entering blood.',
+              'The large intestine is the main site where pancreatic enzymes digest food before nutrients enter circulation.'
             ], correctEvidence:[0,2],
             feedback:'The claim is supported. These enzymes are useful precisely because they act locally in the intestinal lumen and help create absorbable nutrient products.' }
         ]
@@ -618,42 +672,42 @@
         initialEvidence:{integrity:['Meal is being digested normally','good'], site:['Food moving through GI tract','neutral'], absorption:['Absorption depends on healthy villi','neutral'], local:['Main issue is absorptive surface, not major failure of chewing or acid secretion','neutral'], secondary:['Iron, calcium, folate, and fat-soluble vitamin status may be affected if absorption falls','neutral']},
         steps:[
           { type:'mcq', key:'classify', title:'Checkpoint 1: Identify the main issue', prompt:'What best describes this case?', options:[
-              'An absorption disorder caused by small-intestinal damage',
-              'A stomach-acid disorder only',
-              'A hormone that must reach the bloodstream intact',
-              'A fiber supplement for constipation'
+              'An absorption disorder caused by damage to the small-intestinal surface',
+              'A digestion disorder caused by too little hydrochloric acid in the stomach',
+              'A hormone-delivery disorder caused by breakdown of peptide bonds in the stomach',
+              'A motility disorder caused by excessive water absorption in the large intestine'
             ], correct:0,
             feedback:'The main issue is not whether food is digested into smaller parts. The main issue is whether digested nutrients can cross a damaged intestinal surface.' },
           { type:'mcq', key:'success', title:'Checkpoint 2: Define success', prompt:'What must happen for the person to maintain normal nutrient status?', options:[
-              'Nutrients only need to reach the stomach',
-              'Nutrients must be digested and then absorbed across healthy villi into blood or lymph',
-              'All nutrients must remain in the intestinal lumen',
-              'Bile alone must digest the whole meal'
+              'Nutrients must reach the stomach and mix with acid before normal status can be maintained',
+              'Nutrients must be digested and then cross healthy villi into the blood or lymph',
+              'Nutrients must remain in the intestinal lumen so bacteria can use them',
+              'Nutrients must bind bile and pass unchanged into the large intestine'
             ], correct:1,
             feedback:'Digestion and absorption are related but not identical. The products of digestion still must cross the intestinal lining.' },
           { type:'mcq', key:'stomach', title:'Checkpoint 3: Stomach checkpoint', prompt:'What is the best interpretation of the stomach checkpoint in this case?', options:[
-              'Stomach digestion may be mostly normal, so the major problem has not appeared yet',
-              'The stomach usually repairs villi damage before the meal reaches the intestine',
-              'The stomach absorbs most vitamins and minerals directly',
-              'The stomach converts all food into blood'
+              'Stomach digestion may be normal, so the primary absorption problem has not appeared yet',
+              'Stomach acid may repair damaged villi before chyme reaches the small intestine',
+              'The stomach wall may absorb most vitamins and minerals before villi are needed',
+              'Stomach enzymes may convert all nutrients directly into circulating blood'
             ], correct:0,
             feedback:'This case is helpful because it shows that a person can still have nutrient problems even if earlier digestive steps look normal.',
             evidenceAfter:{integrity:['Food is being broken down appropriately so far','good'], site:['Stomach moving chyme onward','neutral'], absorption:['Still awaiting intestinal absorption step','neutral'], local:['No major stomach-level defect explains the nutrient problem','neutral'], secondary:['Nutrient risk comes later at the absorptive surface','neutral']}
           },
           { type:'mcq', key:'intestine', title:'Checkpoint 4: Small intestine and absorption checkpoint', prompt:'What best explains the small-intestine problem?', options:[
-              'Many nutrients may be in absorbable chemical form, but damaged villi reduce the surface available for absorption',
-              'Digested nutrients automatically become part of the bloodstream even if villi are damaged',
-              'Bicarbonate permanently cures villus injury',
-              'Villi damage improves absorption by making the intestine flatter'
+              'Nutrients may be chemically ready, but damaged villi reduce the surface area available for absorption',
+              'Nutrients may be chemically ready, so they enter the blood normally despite damaged villi',
+              'Bicarbonate may rebuild damaged villi and restore absorption during the same meal',
+              'Flattened villi may improve absorption by shortening the distance nutrients must travel'
             ], correct:0,
             feedback:'This is the heart of the case: digestion may proceed, but absorption can still fail.',
             evidenceAfter:{integrity:['Many nutrients are chemically ready','good'], site:['Small-intestinal border with damaged villi','bad'], absorption:['Absorption is reduced by surface damage','bad'], local:['Main problem is malabsorption','bad'], secondary:['Possible lower absorption of iron, calcium, folate, and fat-soluble vitamins','bad']}
           },
           { type:'final', key:'verdict', title:'Checkpoint 5: Evidence-based verdict', prompt:'What is the best verdict on the original claim?', verdictOptions:['Supported','Partially supported','Not supported'], correctVerdict:2, evidenceOptions:[
-              'The stomach may look mostly normal, so digestion can begin appropriately.',
-              'If nutrients are chemically digested, absorption is guaranteed regardless of intestinal damage.',
-              'At the small-intestinal border, villus damage can reduce absorption even when nutrients are otherwise ready.',
-              'Celiac disease mainly improves iron and calcium absorption.'
+              'The stomach may function normally, allowing digestion to begin before the absorption problem appears.',
+              'If nutrients are chemically digested, they enter circulation normally even when the villi are damaged.',
+              'At the small-intestinal border, villus damage can reduce absorption even when nutrients are chemically ready.',
+              'At the small-intestinal border, villus damage improves iron and calcium absorption from the meal.'
             ], correctEvidence:[0,2],
             feedback:'The claim is not supported. Normal digestion does not guarantee normal nutrient status if the main problem is reduced absorptive surface in the small intestine.' }
         ]
@@ -676,6 +730,7 @@
     const startScreen = document.getElementById('startScreen');
     const simScreen = document.getElementById('simScreen');
     const reportScreen = document.getElementById('reportScreen');
+    const reflectionScreen = document.getElementById('reflectionScreen');
     const progressBar = document.getElementById('progressBar');
     const caseIdTag = document.getElementById('caseIdTag');
     const caseTitle = document.getElementById('caseTitle');
@@ -698,6 +753,23 @@
       }
       return arr;
     }
+
+    function randomizeCaseOptions(caseObj){
+      caseObj.steps.forEach(step=>{
+        if(step.type==='mcq'){
+          const indexed = step.options.map((text,index)=>({text,index}));
+          const mixed = shuffle(indexed);
+          step.options = mixed.map(item=>item.text);
+          step.correct = mixed.findIndex(item=>item.index===step.correct);
+        } else if(step.type==='final'){
+          const indexed = step.evidenceOptions.map((text,index)=>({text,index}));
+          const mixed = shuffle(indexed);
+          step.evidenceOptions = mixed.map(item=>item.text);
+          step.correctEvidence = step.correctEvidence.map(oldIndex=>mixed.findIndex(item=>item.index===oldIndex));
+        }
+      });
+      return caseObj;
+    }
     function makeId(prefix){
       const rand = Math.random().toString(36).slice(2,7).toUpperCase();
       const stamp = new Date();
@@ -707,7 +779,7 @@
 
     function startCase(){
       state.student = document.getElementById('studentName').value.trim() || 'Not entered';
-      state.caseObj = clone(casePool[Math.floor(Math.random()*casePool.length)]);
+      state.caseObj = randomizeCaseOptions(clone(casePool[Math.floor(Math.random()*casePool.length)]));
       state.simId = makeId(state.caseObj.id);
       state.stepIndex = 0;
       state.currentEvidence = clone(state.caseObj.initialEvidence);
@@ -716,6 +788,7 @@
       state.fingerprint = '';
       startScreen.classList.add('hidden');
       reportScreen.classList.add('hidden');
+      reflectionScreen.classList.add('hidden');
       simScreen.classList.remove('hidden');
       caseIdTag.textContent = `Case ${state.caseObj.id} • ${state.simId}`;
       caseTitle.textContent = state.caseObj.title;
@@ -861,6 +934,7 @@
       if(state.stepIndex >= state.caseObj.steps.length){
         buildReport();
         simScreen.classList.add('hidden');
+        reflectionScreen.classList.add('hidden');
         reportScreen.classList.remove('hidden');
         window.scrollTo({top:0,behavior:'smooth'});
       } else {
@@ -878,6 +952,8 @@
       document.getElementById('rFingerprint').textContent = state.fingerprint;
       document.getElementById('rCase').textContent = state.caseObj.title;
       document.getElementById('rClaim').textContent = state.caseObj.claim;
+      document.getElementById('reflectionCase').textContent = state.caseObj.title;
+      document.getElementById('reflectionSimId').textContent = state.simId;
       document.getElementById('scoreBig').textContent = `${totalPoints} / ${maxPoints}`;
       document.getElementById('scoreText').textContent = 'This score reflects the decision checkpoints only. The short-answer responses should be graded with the rubric.';
 
@@ -902,6 +978,18 @@
       document.getElementById('sa2').value='';
     }
 
+    function openReflection(){
+      reportScreen.classList.add('hidden');
+      reflectionScreen.classList.remove('hidden');
+      window.scrollTo({top:0,behavior:'smooth'});
+    }
+
+    function backToReport(){
+      reflectionScreen.classList.add('hidden');
+      reportScreen.classList.remove('hidden');
+      window.scrollTo({top:0,behavior:'smooth'});
+    }
+
     function resizeTextarea(el){
       el.style.height = 'auto';
       el.style.height = `${Math.max(130, el.scrollHeight)}px`;
@@ -916,12 +1004,15 @@
       }
       resizeTextarea(first);
       resizeTextarea(second);
+      document.body.classList.add('printing');
       window.print();
     }
 
     document.getElementById('startBtn').addEventListener('click', startCase);
     submitBtn.addEventListener('click', submitCurrent);
     nextBtn.addEventListener('click', nextStep);
+    document.getElementById('openReflectionBtn').addEventListener('click', openReflection);
+    document.getElementById('backToReportBtn').addEventListener('click', backToReport);
     document.getElementById('printBtn').addEventListener('click', saveReportAsPdf);
     document.querySelectorAll('textarea').forEach(el=>{
       el.addEventListener('input', ()=>resizeTextarea(el));
@@ -929,8 +1020,12 @@
     window.addEventListener('beforeprint', ()=>{
       document.querySelectorAll('textarea').forEach(resizeTextarea);
     });
+    window.addEventListener('afterprint', ()=>{
+      document.body.classList.remove('printing');
+    });
     document.getElementById('newCaseBtn').addEventListener('click', ()=>{
       reportScreen.classList.add('hidden');
+      reflectionScreen.classList.add('hidden');
       startScreen.classList.remove('hidden');
       window.scrollTo({top:0,behavior:'smooth'});
     });
