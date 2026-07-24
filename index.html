@@ -7,15 +7,12 @@
   <style>
     :root{
       --olive:#6b7a52;
-      --sage:#aab59b;
       --terracotta:#b75a3c;
       --sand:#e9dfcf;
       --cream:#f7f3ec;
       --charcoal:#2f3430;
       --gold:#c49a3a;
       --teal:#4a7d78;
-      --soft-red:#b94b4b;
-      --soft-blue:#557a9b;
       --line:#d7cdbd;
       --good:#2f7a4d;
       --bad:#973d2f;
@@ -247,6 +244,7 @@
             <h2 id="caseTitle"></h2>
             <p class="claim" id="caseClaim"></p>
             <p id="caseLead"></p>
+            <div class="note" id="caseCompare"></div>
           </div>
           <div class="card" id="questionCard">
             <div class="question-title" id="questionTitle"></div>
@@ -735,6 +733,7 @@
     const caseTitle = document.getElementById('caseTitle');
     const caseClaim = document.getElementById('caseClaim');
     const caseLead = document.getElementById('caseLead');
+    const caseCompare = document.getElementById('caseCompare');
     const questionTitle = document.getElementById('questionTitle');
     const questionPrompt = document.getElementById('questionPrompt');
     const questionBody = document.getElementById('questionBody');
@@ -793,7 +792,7 @@
       caseTitle.textContent = state.caseObj.title;
       caseClaim.textContent = state.caseObj.claim;
       caseLead.textContent = state.caseObj.lead;
-      renderProgress();
+      caseCompare.innerHTML = `<strong>Compare &amp; contrast (${state.caseObj.contrast}):</strong> ${state.caseObj.comparePrompt}`;
       renderEvidence();
       renderStep();
       window.scrollTo({top:0,behavior:'smooth'});
@@ -836,6 +835,7 @@
       submitBtn.classList.remove('hidden');
       nextBtn.classList.add('hidden');
       const step = state.caseObj.steps[state.stepIndex];
+      nextBtn.textContent = (state.stepIndex >= state.caseObj.steps.length - 1) ? 'View Report' : 'Next Checkpoint';
       questionTitle.textContent = step.title;
       questionPrompt.textContent = step.prompt;
       questionBody.innerHTML='';
@@ -919,7 +919,6 @@
           correct: verdictCorrect && exactEvidence, points, maxPoints:4});
         feedback.className = `feedback ${(verdictCorrect && exactEvidence)?'correct':'incorrect'}`;
         feedback.innerHTML = `<strong>${(verdictCorrect && exactEvidence)?'Strong case verdict.':'Review the evidence.'}</strong> ${step.feedback}<br><br><strong>Best verdict:</strong> ${step.verdictOptions[step.correctVerdict]}<br><strong>Best evidence:</strong><ul><li>${step.correctEvidence.map(i=>step.evidenceOptions[i]).join('</li><li>')}</li></ul>`;
-        state.evidenceHistory.push({location:'Final verdict prepared', snapshot:clone(state.currentEvidence)});
       }
 
       disableInputs();
@@ -944,7 +943,7 @@
     function buildReport(){
       const totalPoints = state.responses.reduce((a,b)=>a+b.points,0);
       const maxPoints = state.responses.reduce((a,b)=>a+b.maxPoints,0);
-      state.fingerprint = state.responses.map((r,idx)=>`${idx+1}${r.points}/${r.maxPoints}`).join('-');
+      state.fingerprint = state.responses.map((r,idx)=>`C${idx+1}:${r.points}/${r.maxPoints}`).join(' · ');
 
       document.getElementById('rStudent').textContent = state.student;
       document.getElementById('rSimId').textContent = state.simId;
