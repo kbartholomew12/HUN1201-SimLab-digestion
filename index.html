@@ -139,6 +139,13 @@
       width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;font:inherit
     }
     textarea{min-height:130px;resize:vertical}
+
+    /* Print-only mirror for long student responses.
+       Browser print engines can clip textarea content to the visible box.
+       The mirror is normal flowing text, so the full response can span pages. */
+    .print-answer{
+      display:none;
+    }
     .small{font-size:.9rem;color:#666}
     .scorebox{
       background:linear-gradient(135deg,#fcfaf6,#f3ebdc);
@@ -156,9 +163,48 @@
       body{background:#fff}
       .hero{box-shadow:none}
       .no-print{display:none !important}
-      .card{box-shadow:none}
       .wrap{max-width:none;padding:0}
-      textarea{border:1px solid #999;min-height:150px}
+
+      /* Let long cards and reflections flow naturally across PDF pages. */
+      .card{
+        box-shadow:none;
+        break-inside:auto;
+        page-break-inside:auto;
+      }
+
+      /* Keep compact elements together where practical. */
+      .mini,
+      .scorebox,
+      tr{
+        break-inside:avoid;
+        page-break-inside:avoid;
+      }
+
+      /* Hide the real textarea in print because some browsers only print
+         the visible scroll area rather than the student's full response. */
+      textarea.print-source{
+        display:none !important;
+      }
+
+      /* Print the response as normal page text so every line is included. */
+      .print-answer{
+        display:block !important;
+        width:100%;
+        min-height:150px;
+        margin-top:8px;
+        padding:12px;
+        border:1px solid #999;
+        border-radius:10px;
+        background:#fff;
+        white-space:pre-wrap;
+        overflow-wrap:anywhere;
+        word-break:break-word;
+        font:inherit;
+        line-height:1.5;
+        break-inside:auto;
+        page-break-inside:auto;
+      }
+
       body.printing #reportScreen.hidden,
       body.printing #reflectionScreen.hidden{display:block !important}
       body.printing #startScreen,
@@ -993,6 +1039,26 @@
       el.style.height = `${Math.max(130, el.scrollHeight)}px`;
     }
 
+    function preparePrintableAnswers(){
+      document.querySelectorAll('textarea').forEach((field,index)=>{
+        if(!field.id){
+          field.id = `simlabTextarea${index+1}`;
+        }
+
+        field.classList.add('print-source');
+
+        let mirror = document.querySelector(`.print-answer[data-print-for="${field.id}"]`);
+        if(!mirror){
+          mirror = document.createElement('div');
+          mirror.className = 'print-answer';
+          mirror.setAttribute('data-print-for', field.id);
+          field.insertAdjacentElement('afterend', mirror);
+        }
+
+        mirror.textContent = field.value.trim() || 'No response entered.';
+      });
+    }
+
     function saveReportAsPdf(){
       const first = document.getElementById('sa1');
       const second = document.getElementById('sa2');
@@ -1000,8 +1066,10 @@
         alert('Please complete both open-ended questions before saving your report as a PDF.');
         return;
       }
+
       resizeTextarea(first);
       resizeTextarea(second);
+      preparePrintableAnswers();
       document.body.classList.add('printing');
       window.print();
     }
@@ -1012,12 +1080,17 @@
     document.getElementById('openReflectionBtn').addEventListener('click', openReflection);
     document.getElementById('backToReportBtn').addEventListener('click', backToReport);
     document.getElementById('printBtn').addEventListener('click', saveReportAsPdf);
+
     document.querySelectorAll('textarea').forEach(el=>{
       el.addEventListener('input', ()=>resizeTextarea(el));
     });
+
+    /* Also handles Ctrl+P / browser Print. */
     window.addEventListener('beforeprint', ()=>{
       document.querySelectorAll('textarea').forEach(resizeTextarea);
+      preparePrintableAnswers();
     });
+
     window.addEventListener('afterprint', ()=>{
       document.body.classList.remove('printing');
     });
